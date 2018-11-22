@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="cbutton.h" />
     <ClInclude Include="cframe.h" />
     <ClInclude Include="cgdi.h" />
     <ClInclude Include="cmouse.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cbutton.cpp" />
     <ClCompile Include="cframe.cpp" />
     <ClCompile Include="cgdi.cpp" />
     <ClCompile Include="cmouse.cpp" />

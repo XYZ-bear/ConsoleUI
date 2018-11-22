@@ -12,6 +12,7 @@ public:
 	void draw_retangle(c_point p1, c_point p2, int width = 1, COLORREF color = RGB(255, 255, 255), int style = PS_SOLID);
 	void draw_frame_rect(c_point p1, c_point p2, int width = 1, COLORREF color = RGB(255, 255, 255), int style = PS_SOLID);
 	void draw_text();
+	void fill_rect(c_point p1, c_point p2, int width = 1, COLORREF color = RGB(255, 255, 255));
 	void set_refer_point(c_point rp);
 	void update();
 	void init();

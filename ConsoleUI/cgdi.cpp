@@ -40,6 +40,11 @@ void cgdi::draw_frame_rect(c_point p1, c_point p2, int width, COLORREF color, in
 	DeleteObject(hpen_);
 }
 
+void cgdi::fill_rect(c_point p1, c_point p2, int width, COLORREF color) {
+	RECT rect{ p1.x,p1.y,p2.x,p2.y };
+	FillRect(buffer_hdc_,&rect, CreateSolidBrush(color));
+}
+
 void cgdi::draw_text() {
 	//DrawText()
 	RECT rect{ 100, 100, 200, 300 };

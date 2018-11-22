@@ -33,7 +33,7 @@ int cwbase::get_console_height() {
 	return bInfo.srWindow.Bottom - bInfo.srWindow.Top;
 }
 
-cgdi& cwbase::get_cgdi() { return _gdi; }
+cgdi& cwbase::get_gdi() { return _gdi; }
 
 bool cwbase::create(c_point op, int width, int height) {
 	_left_top = op;
@@ -66,6 +66,19 @@ void cwbase::set_point(c_point point){
 	_gdi.set_refer_point(_left_top);
 }
 
+void cwbase::set_size(c_point op, int width, int height) {
+	_left_top = op;
+	_right_bottom = { op.x + width,op.y + height };
+	_width = width;
+	_height = height;
+	_gdi.set_rng(width, height);
+	_gdi.set_refer_point(_left_top);
+}
+
 c_point cwbase::get_point() {
+	return _left_top;
+}
+
+c_point &cwbase::get_left_top() {
 	return _left_top;
 }

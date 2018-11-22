@@ -3,6 +3,7 @@
 #include "cgdi.h"
 #include <map>
 
+
 class cwbase
 {
 private:
@@ -15,23 +16,28 @@ protected:
 	int _width =0;
 	int _height =0;
 	cgdi _gdi;
-	map<int, void*> event_func;
 public:
 	cwbase();
 	virtual ~cwbase();
 	int get_width();
 	int get_height();
+	c_point &get_left_top();
 	bool create(c_point op, int width, int height);
 	int get_console_width();
 	int get_console_height();
 	bool is_point_in(c_point p);
-	cgdi& get_cgdi();
+	cgdi& get_gdi();
 	HDC& get_hdc();
 	HWND get_hand();
 	c_point get_point();
 	void set_point(c_point point);
+	void set_size(c_point op, int width, int height);
 public:
+	virtual bool init() = 0;
 	virtual bool update() = 0;
-	virtual void click() = 0;
+	virtual void click_in(c_point p) {};
+	virtual void click_out(c_point p) {};
+	virtual void double_click(c_point p) {};
+	virtual void mouse_move(c_point p){};
 };
 

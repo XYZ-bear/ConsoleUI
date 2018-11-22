@@ -1,7 +1,7 @@
 #pragma once
 
 
-#define MOUSE_EVENT_CLICK 1
+#define MOUSE_CLICK_EVENT 1
 
 struct c_point {
 	long x;
@@ -39,4 +39,10 @@ struct c_point {
 	{
 		return { x - p.x,y - p.y };
 	}
+};
+
+struct c_rect {
+	c_point p;
+	int width;
+	int height;
 };
