@@ -35,11 +35,13 @@ int cwbase::get_console_height() {
 
 cgdi& cwbase::get_gdi() { return _gdi; }
 
-bool cwbase::create(c_point op, int width, int height) {
+bool cwbase::create(c_point op, int width, int height, COLORREF bk_color) {
 	_left_top = op;
 	_right_bottom = { op.x + width,op.y + height };
 	_width = width;
 	_height = height;
+	_bk_color = bk_color;
+	_align = T_v_align_left;
 	_gdi.set_rng(width, height);
 	_gdi.set_refer_point(_left_top);
 	_gdi.init();
@@ -73,6 +75,7 @@ void cwbase::set_size(c_point op, int width, int height) {
 	_height = height;
 	_gdi.set_rng(width, height);
 	_gdi.set_refer_point(_left_top);
+	update();
 }
 
 c_point cwbase::get_point() {
@@ -81,4 +84,8 @@ c_point cwbase::get_point() {
 
 c_point &cwbase::get_left_top() {
 	return _left_top;
+}
+
+void cwbase::set_align(T_align align) {
+	_align = align;
 }

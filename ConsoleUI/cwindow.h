@@ -41,6 +41,8 @@ public:
 		add_cmd(this,id,base,func);
 	}
 	bool is_close() { return is_close_; }
+	c_point get_client_point(c_point p);
+	T_hint hint_t() { return hint_t_; }
 private:
 	template<class T, class _Fn>
 	void add_cmd(T *con, int id, cwbase *base, _Fn func) {
@@ -54,9 +56,12 @@ private:
 	string title_;
 	c_point old_init_point;
 	c_point pre_point;
+	c_point cur_point;
 	c_rect old_rect;
 	int header_height;
 	bool is_mouse_in_header;
+	T_hint hint_t_ = T_hint_nono;
+	bool is_drag_ = false;
 	bool is_close_ = false;
 	bool is_max_ = false;
 	function<void (int id, cwbase *base,void* data)> call_func_;
@@ -67,5 +72,8 @@ public:
 	void click_out(c_point p);
 	void mouse_move(c_point p);
 	void double_click(c_point p);
+	void hint(c_point p);
+	void drag(c_point p);
+	void size_change(c_rect rect);
 };
 

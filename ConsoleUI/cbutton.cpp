@@ -13,7 +13,11 @@ cbutton::~cbutton()
 
 bool cbutton::update()
 {
-	_gdi.fill_rect({ 0,0 }, { _width ,_height }, 1, RGB(0, 255, 0));
+	//_gdi.fill_rect({ 0,0 }, { _width ,_height }, 1, RGB(0, 255, 0));
+	if (button_type == T_circle_button)
+		_gdi.draw_ellipse({ 0,0 }, _width, _bk_color);
+	else
+		_gdi.fill_rect({ 0,0 }, { _width ,_height }, 1, RGB(0, 255, 0));
 	return true;
 }
 

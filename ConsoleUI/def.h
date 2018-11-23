@@ -1,7 +1,27 @@
 #pragma once
 
+/*mouse_event*/
+#define D_mouse_click_event 1
 
-#define MOUSE_CLICK_EVENT 1
+/*hint_type*/
+enum T_hint
+{
+	T_hint_nono,
+	T_hint_right,
+	T_hint_bottom,
+	T_hint_right_bottom
+};
+
+/*align*/
+enum T_align
+{
+	T_v_align_left = 0x1,
+	T_v_align_right = 0x2,
+	T_v_align_center = 0x4,
+	T_h_align_left = 0x8,
+	T_h_align_right = 0x10,
+	T_h_align_center = 0x20,
+};
 
 struct c_point {
 	long x;
