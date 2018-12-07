@@ -42,6 +42,12 @@
     <ClInclude Include="cbutton.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ccombox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cmenu.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -66,6 +72,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="cbutton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ccombox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cmenu.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

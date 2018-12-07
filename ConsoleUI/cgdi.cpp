@@ -18,22 +18,24 @@ void cgdi::init() {
 
 void cgdi::draw_line(c_point p1, c_point p2, int width, COLORREF color, int style) {
 	hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
-	SelectObject(buffer_hdc_, hpen_);//画笔绑定到句柄
+	open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
 	MoveToEx(buffer_hdc_, p1.x, p1.y, NULL);
 	LineTo(buffer_hdc_, p2.x, p2.y);
+	SelectObject(hdc_, open_);
 	DeleteObject(hpen_);
 }
 
 void cgdi::draw_retangle(c_point p1, c_point p2, int width, COLORREF color, int style) {
 	hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
-	SelectObject(buffer_hdc_, hpen_);//画笔绑定到句柄
+	open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
 	Rectangle(buffer_hdc_, p1.x, p1.y, p2.x, p2.y);
+	SelectObject(hdc_, open_);
 	DeleteObject(hpen_);
 }
 
 void cgdi::draw_frame_rect(c_point p1, c_point p2, int width, COLORREF color, int style) {
 	hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
-	open_ = (HPEN)SelectObject(hdc_, hpen_);
+	open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
 	RECT rect{ p1.x,p1 .y,p2.x,p2.y};
 	HBRUSH br = CreateSolidBrush(color);
 	FrameRect(buffer_hdc_, &rect,br);
@@ -60,10 +62,10 @@ void cgdi::draw_ellipse(c_point p, int len, COLORREF color) {
 	Ellipse(buffer_hdc_, p.x, p.y, p.x + len , p.y + len);
 
 	SelectObject(buffer_hdc_, hOldBrush);
-	DeleteObject(hPen);
+	DeleteObject(hBrush);
 
 	SelectObject(buffer_hdc_, hOldPen);
-	DeleteObject(hOldBrush);
+	DeleteObject(hPen);
 }
 
 void cgdi::draw_text(string str, c_point p, int height, COLORREF color) {

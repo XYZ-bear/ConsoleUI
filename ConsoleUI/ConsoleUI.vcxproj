@@ -148,8 +148,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="cbutton.h" />
+    <ClInclude Include="ccombox.h" />
     <ClInclude Include="cframe.h" />
     <ClInclude Include="cgdi.h" />
+    <ClInclude Include="cmenu.h" />
     <ClInclude Include="cmouse.h" />
     <ClInclude Include="cwbase.h" />
     <ClInclude Include="cwindow.h" />
@@ -159,8 +161,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cbutton.cpp" />
+    <ClCompile Include="ccombox.cpp" />
     <ClCompile Include="cframe.cpp" />
     <ClCompile Include="cgdi.cpp" />
+    <ClCompile Include="cmenu.cpp" />
     <ClCompile Include="cmouse.cpp" />
     <ClCompile Include="ConsoleUI.cpp" />
     <ClCompile Include="cwbase.cpp" />

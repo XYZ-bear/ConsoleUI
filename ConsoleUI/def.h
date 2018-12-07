@@ -12,6 +12,13 @@ enum T_hint
 	T_hint_right_bottom
 };
 
+/*control type*/
+enum T_ctr_type
+{
+	T_window,
+	T_button
+};
+
 /*align*/
 enum T_align
 {
@@ -65,4 +72,9 @@ struct c_rect {
 	c_point p;
 	int width;
 	int height;
+	bool is_point_in(c_point pi) {
+		if (pi > p&&pi < c_point{p.x + width, p.y + height})
+			return true;
+		return false;
+	}
 };

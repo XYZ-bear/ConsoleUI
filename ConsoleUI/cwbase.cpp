@@ -40,7 +40,11 @@ bool cwbase::create(c_point op, int width, int height, COLORREF bk_color) {
 	_right_bottom = { op.x + width,op.y + height };
 	_width = width;
 	_height = height;
-	_bk_color = bk_color;
+
+	_active_color = bk_color;
+	_color = bk_color;
+	_mouse_in_color = bk_color;
+
 	_align = T_v_align_left;
 	_gdi.set_rng(width, height);
 	_gdi.set_refer_point(_left_top);
@@ -84,8 +88,4 @@ c_point cwbase::get_point() {
 
 c_point &cwbase::get_left_top() {
 	return _left_top;
-}
-
-void cwbase::set_align(T_align align) {
-	_align = align;
 }

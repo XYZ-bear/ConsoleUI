@@ -99,8 +99,10 @@ public:
 								window->click_in(old);
 								if (window->is_close()) {
 									window_list.erase(it);
-									active_window = *(--window_list.end());
-									active_it = window_list.end();
+									if (window_list.size() > 0) {
+										active_window = *(--window_list.end());
+										active_it = window_list.end();
+									}
 									break;
 								}
 								active_window = window;
