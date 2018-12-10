@@ -16,7 +16,8 @@ enum T_hint
 enum T_ctr_type
 {
 	T_window,
-	T_button
+	T_button,
+	T_edit
 };
 
 /*align*/

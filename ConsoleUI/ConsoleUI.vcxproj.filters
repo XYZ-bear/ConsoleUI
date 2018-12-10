@@ -48,6 +48,12 @@
     <ClInclude Include="cmenu.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="cedit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ctimer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -78,6 +84,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="cmenu.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cedit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ctimer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

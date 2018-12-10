@@ -149,10 +149,12 @@
   <ItemGroup>
     <ClInclude Include="cbutton.h" />
     <ClInclude Include="ccombox.h" />
+    <ClInclude Include="cedit.h" />
     <ClInclude Include="cframe.h" />
     <ClInclude Include="cgdi.h" />
     <ClInclude Include="cmenu.h" />
     <ClInclude Include="cmouse.h" />
+    <ClInclude Include="ctimer.h" />
     <ClInclude Include="cwbase.h" />
     <ClInclude Include="cwindow.h" />
     <ClInclude Include="def.h" />
@@ -162,11 +164,13 @@
   <ItemGroup>
     <ClCompile Include="cbutton.cpp" />
     <ClCompile Include="ccombox.cpp" />
+    <ClCompile Include="cedit.cpp" />
     <ClCompile Include="cframe.cpp" />
     <ClCompile Include="cgdi.cpp" />
     <ClCompile Include="cmenu.cpp" />
     <ClCompile Include="cmouse.cpp" />
     <ClCompile Include="ConsoleUI.cpp" />
+    <ClCompile Include="ctimer.cpp" />
     <ClCompile Include="cwbase.cpp" />
     <ClCompile Include="cwindow.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -4,6 +4,8 @@
 #include "cbutton.h"
 #include "ccombox.h"
 #include "cmenu.h"
+#include "cedit.h"
+#include "ctimer.h"
 
 cwindow::cwindow()
 {
@@ -53,6 +55,10 @@ bool cwindow::init() {
 	comb->get_root()[3].text = "root4";
 	comb->create({ 65,65 }, 70,90, RGB(255, 0, 0));
 	add_child(comb);
+
+	cedit *edit = new cedit();
+	edit->create({ 200,100 }, 50, 20, RGB(255, 215, 0));
+	add_child(edit);
 
 	return true;
 }
@@ -108,6 +114,13 @@ void cwindow::click_in(c_point p) {
 
 void cwindow::click_out(c_point p) {
 	is_mouse_in_header = false;
+	auto it = chidren_list.end();
+	while (chidren_list.begin() != it) {
+		auto child = *(--it);
+		if (child&&child->is_point_in(p - get_left_top())) {
+			child->click_out(p);
+		}
+	}
 }
 
 void cwindow::mouse_move(c_point p) {

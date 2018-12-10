@@ -4,6 +4,7 @@
 #include <list>
 #include <thread>
 #include <iostream>
+#include "ctimer.h"
 using namespace std;
 
 class cframe
@@ -59,76 +60,93 @@ public:
 				}
 			}
 
+
+			
 			INPUT_RECORD keyRec;
 			DWORD state = 0, res;
 			HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-			ReadConsoleInput(hIn, &keyRec, 1, &res);
+			int num;
+			LPDWORD f=(LPDWORD)&num;
+			GetNumberOfConsoleInputEvents(hIn, f);
+			num = *f;
+			if (num > 0) {
+				ReadConsoleInput(hIn, &keyRec, 1, &res);
 
-			if (keyRec.EventType == MOUSE_EVENT) {
-				POINT p;
-				GetCursorPos(&p);
-				ScreenToClient(GetConsoleWindow(), &p);
-				if (keyRec.Event.MouseEvent.dwEventFlags == MOUSE_MOVED) {
-					if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-						if (active_window) {
-							active_window->drag({ p.x ,p.y });
-						}
-					}
-					if (active_window) {
-						active_window->mouse_move({ p.x ,p.y });
-					}
-				}
-				if (keyRec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK) {
-					if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-						if (active_window) {
-							active_window->double_click({ p.x ,p.y });
-						}
-					}
-				}
-				if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
-					old = { p.x ,p.y };
-
-					auto it = window_list.end();
-					auto active_it = window_list.end();
-					while (window_list.begin() != it) {
-						auto window = *(--it);
-						if (window) {
-							if (window->hint_t())
-								break;
-							if (window->is_point_in({ p.x ,p.y }) && active_it == window_list.end()) {
-								window->click_in(old);
-								if (window->is_close()) {
-									window_list.erase(it);
-									if (window_list.size() > 0) {
-										active_window = *(--window_list.end());
-										active_it = window_list.end();
-									}
-									break;
-								}
-								active_window = window;
-								active_it = it;
+				if (keyRec.EventType == MOUSE_EVENT) {
+					POINT p;
+					GetCursorPos(&p);
+					ScreenToClient(GetConsoleWindow(), &p);
+					if (keyRec.Event.MouseEvent.dwEventFlags == MOUSE_MOVED) {
+						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
+							if (active_window) {
+								active_window->drag({ p.x ,p.y });
 							}
-							else
-								window->click_out(old);
+						}
+						if (active_window) {
+							active_window->mouse_move({ p.x ,p.y });
 						}
 					}
-					if (active_it != window_list.end()) {
-						window_list.erase(active_it);
-						window_list.push_back(active_window);
+					if (keyRec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK) {
+						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
+							if (active_window) {
+								active_window->double_click({ p.x ,p.y });
+							}
+						}
+					}
+					if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
+						old = { p.x ,p.y };
+
+						auto it = window_list.end();
+						auto active_it = window_list.end();
+						while (window_list.begin() != it) {
+							auto window = *(--it);
+							if (window) {
+								if (window->hint_t())
+									break;
+								if (window->is_point_in({ p.x ,p.y }) && active_it == window_list.end()) {
+									window->click_in(old);
+									if (window->is_close()) {
+										window_list.erase(it);
+										if (window_list.size() > 0) {
+											active_window = *(--window_list.end());
+											active_it = window_list.end();
+										}
+										break;
+									}
+									active_window = window;
+									active_it = it;
+								}
+								else
+									window->click_out(old);
+							}
+						}
+						if (active_it != window_list.end()) {
+							window_list.erase(active_it);
+							window_list.push_back(active_window);
+						}
+					}
+					if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
+						if (active_window) {
+							active_window->click_in({ p.x ,p.y });
+						}
 					}
 				}
-				if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-					if (active_window) {
-						active_window->click_in({ p.x ,p.y });
+
+				if (keyRec.EventType == WINDOW_BUFFER_SIZE_EVENT) {
+					DeleteObject(bmp);
+					bmp = CreateCompatibleBitmap(hdc, get_console_width(), get_console_height());
+					SelectObject(buffer_hdc, bmp);
+				}
+
+				if (keyRec.EventType == KEY_EVENT) {
+					if (keyRec.Event.KeyEvent.bKeyDown)
+					{
+						//m_cmd += keyRec.Event.KeyEvent.uChar.AsciiChar;
 					}
 				}
 			}
 
-			if (keyRec.EventType == WINDOW_BUFFER_SIZE_EVENT) {
-				DeleteObject(bmp);
-				bmp = CreateCompatibleBitmap(hdc, get_console_width(), get_console_height());
-				SelectObject(buffer_hdc, bmp);
-			}
+			ctimer::instance().check_timer();
 
 			for (auto &cwindow : window_list) {
 				if (cwindow) {
@@ -136,10 +154,13 @@ public:
 				}
 			}
 			BitBlt(hdc, 0, 0, get_console_width(), get_console_height(), buffer_hdc, 0, 0, SRCCOPY);
+
+			
 		}
 	}
 
 	void input_event() {
+
 	}
 
 	bool add(cwindow* window) {
