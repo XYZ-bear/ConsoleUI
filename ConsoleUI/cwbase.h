@@ -22,6 +22,8 @@ protected:
 	COLORREF _active_color;
 	COLORREF _color;
 	COLORREF _mouse_in_color;
+
+	bool _is_focus;
 public:
 	cwbase();
 	virtual ~cwbase();
@@ -45,6 +47,11 @@ public:
 
 	void set_color(COLORREF color) { _active_color = color; _color = color; };
 	void set_mouse_in_color(COLORREF color) { _mouse_in_color = color; };
+
+	bool is_focus() { return _is_focus; }
+	void set_is_focus(bool is) { _is_focus = is; }
+
+	void erase_bk();
 public:
 	virtual bool init() = 0;
 	virtual bool update() = 0;
@@ -55,5 +62,7 @@ public:
 	virtual void mouse_move(c_point p){};
 	virtual void mouse_move_in(c_point p) {};
 	virtual void mouse_move_out(c_point p) {};
+	virtual void input_key(char key) {};
+	virtual void foucs() {};
 };
 

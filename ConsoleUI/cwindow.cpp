@@ -70,8 +70,11 @@ bool cwindow::update() {
 	_gdi.draw_line({ 0,header_height }, { _width,header_height }, 2, RGB(255, 144, 0));
 	_gdi.draw_text(title_, {10,5});
 	for (auto &child : chidren_list) {
-		child->update();
-		BitBlt(get_gdi().buffer_hdc_, child->get_gdi().refer_c_point_.x, child->get_gdi().refer_c_point_.y, child->get_gdi().width_, child->get_gdi().height_, child->get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
+		//if (child->get_gdi().get_change()) {
+			child->update();
+			BitBlt(get_gdi().buffer_hdc_, child->get_gdi().refer_c_point_.x, child->get_gdi().refer_c_point_.y, child->get_gdi().width_, child->get_gdi().height_, child->get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
+		//	child->get_gdi().set_change(false);
+		//}
 	}
 	return true;
 }
@@ -102,12 +105,20 @@ void cwindow::click_in(c_point p) {
 	
 	pre_point = p;
 	auto it = chidren_list.end();
+	bool is_top_click_ctr = false;
 	while (chidren_list.begin() != it) {
 		auto child = *(--it);
-		if (child&&child->is_point_in(p-get_left_top())) {
+		if (child&&child->is_point_in(p-get_left_top())&& is_top_click_ctr==false) {
 			child->click_in(p);
 			call_func_(D_mouse_click_event, child,&p);
-			break;
+			child->set_is_focus(true);
+			focus_ctr = child;
+			is_top_click_ctr = true;
+			//break;
+		}
+		else {
+			child->click_out(p);
+			child->set_is_focus(false);
 		}
 	}
 }
@@ -117,9 +128,8 @@ void cwindow::click_out(c_point p) {
 	auto it = chidren_list.end();
 	while (chidren_list.begin() != it) {
 		auto child = *(--it);
-		if (child&&child->is_point_in(p - get_left_top())) {
-			child->click_out(p);
-		}
+		child->click_out(p);
+		child->set_is_focus(false);
 	}
 }
 
@@ -246,6 +256,14 @@ void cwindow::size_change(c_rect rect) {
 		if (child->get_align() == T_v_align_right) {
 			int move = old_rect.width - _width;
 			child->set_point({ child->get_point().x - move,child->get_point().y });
+		}
+	}
+}
+
+void cwindow::input_key(char key) {
+	if (focus_ctr) {
+		if (focus_ctr->is_focus()) {
+			focus_ctr->input_key(key);
 		}
 	}
 }

@@ -18,6 +18,8 @@ public:
 	void update();
 	void init();
 	void set_rng(int width, int height);
+	void set_change(bool is);
+	bool get_change();
 	HDC buffer_hdc_;
 	c_point refer_c_point_;
 	int width_;
@@ -29,5 +31,6 @@ private:
 	HPEN hpen_;
 	HPEN open_;
 
+	bool is_change_;
 };
 

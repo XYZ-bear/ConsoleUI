@@ -23,6 +23,7 @@ void cgdi::draw_line(c_point p1, c_point p2, int width, COLORREF color, int styl
 	LineTo(buffer_hdc_, p2.x, p2.y);
 	SelectObject(hdc_, open_);
 	DeleteObject(hpen_);
+	set_change(true);
 }
 
 void cgdi::draw_retangle(c_point p1, c_point p2, int width, COLORREF color, int style) {
@@ -31,6 +32,7 @@ void cgdi::draw_retangle(c_point p1, c_point p2, int width, COLORREF color, int 
 	Rectangle(buffer_hdc_, p1.x, p1.y, p2.x, p2.y);
 	SelectObject(hdc_, open_);
 	DeleteObject(hpen_);
+	set_change(true);
 }
 
 void cgdi::draw_frame_rect(c_point p1, c_point p2, int width, COLORREF color, int style) {
@@ -42,6 +44,7 @@ void cgdi::draw_frame_rect(c_point p1, c_point p2, int width, COLORREF color, in
 	SelectObject(hdc_, open_);
 	DeleteObject(hpen_);
 	DeleteObject(br);
+	set_change(true);
 }
 
 void cgdi::fill_rect(c_point p1, c_point p2, int width, COLORREF color) {
@@ -50,6 +53,7 @@ void cgdi::fill_rect(c_point p1, c_point p2, int width, COLORREF color) {
 	SelectObject(buffer_hdc_,br);
 	FillRect(buffer_hdc_,&rect, br);
 	DeleteObject(br);
+	set_change(true);
 }
 
 void cgdi::draw_ellipse(c_point p, int len, COLORREF color) {
@@ -66,6 +70,7 @@ void cgdi::draw_ellipse(c_point p, int len, COLORREF color) {
 
 	SelectObject(buffer_hdc_, hOldPen);
 	DeleteObject(hPen);
+	set_change(true);
 }
 
 void cgdi::draw_text(string str, c_point p, int height, COLORREF color) {
@@ -83,6 +88,7 @@ void cgdi::draw_text(string str, c_point p, int height, COLORREF color) {
 	SelectObject(buffer_hdc_, hFont); 
 	DrawText(buffer_hdc_, str.c_str(), str.length(), &rect, DT_SINGLELINE | DT_LEFT | DT_VCENTER);
 	DeleteObject(hFont);
+	set_change(true);
 }
 
 void cgdi::set_refer_point(c_point rp) { refer_c_point_ = rp; }
@@ -97,4 +103,12 @@ void cgdi::set_rng(int width, int height) {
 
 void cgdi::update() {
 	BitBlt(hdc_, refer_c_point_.x, refer_c_point_.y, width_, height_,buffer_hdc_, 0, 0, SRCCOPY);
+}
+
+void cgdi::set_change(bool is) {
+	is_change_ = is;
+}
+
+bool cgdi::get_change() {
+	return is_change_;
 }

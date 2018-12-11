@@ -77,6 +77,7 @@ private:
 	function<void (int id, cwbase *base,void* data)> call_func_;
 	base_brigde *brigde_ = nullptr;
 	cwbase *point_ctr=nullptr;
+	cwbase *focus_ctr = nullptr;
 public:
 	bool init();
 	bool update();
@@ -87,6 +88,7 @@ public:
 	void hint(c_point p);
 	void drag(c_point p);
 	void size_change(c_rect rect);
+	void input_key(char key);
 public:
 	void close_click(cwbase *base, void* p);
 	void max_click(cwbase *base, void* p);

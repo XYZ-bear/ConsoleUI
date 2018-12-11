@@ -46,9 +46,6 @@ public:
 		}
 		
 		while (1) {
-			HBITMAP bmp = CreateCompatibleBitmap(hdc, get_console_width(), get_console_height());
-			SelectObject(buffer_hdc, bmp);
-
 
 			RECT rect{ 0,0,get_console_width(),get_console_height() };
 			HBRUSH br = CreateSolidBrush(RGB(0, 0, 0));
@@ -61,7 +58,6 @@ public:
 			}
 
 
-			
 			INPUT_RECORD keyRec;
 			DWORD state = 0, res;
 			HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
@@ -141,10 +137,12 @@ public:
 				if (keyRec.EventType == KEY_EVENT) {
 					if (keyRec.Event.KeyEvent.bKeyDown)
 					{
-						//m_cmd += keyRec.Event.KeyEvent.uChar.AsciiChar;
+						active_window->input_key(keyRec.Event.KeyEvent.uChar.AsciiChar);
 					}
 				}
 			}
+			else
+				Sleep(1);
 
 			ctimer::instance().check_timer();
 
@@ -154,8 +152,6 @@ public:
 				}
 			}
 			BitBlt(hdc, 0, 0, get_console_width(), get_console_height(), buffer_hdc, 0, 0, SRCCOPY);
-
-			
 		}
 	}
 
@@ -170,6 +166,7 @@ public:
 		}
 		return false;
 	}
+
 	void remove(cwindow* window) {
 		for (auto it = window_list.begin(); it != window_list.end(); ++it) {
 			if ((*it) == window && window != nullptr) {

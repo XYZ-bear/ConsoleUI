@@ -89,3 +89,7 @@ c_point cwbase::get_point() {
 c_point &cwbase::get_left_top() {
 	return _left_top;
 }
+
+void cwbase::erase_bk() {
+	_gdi.fill_rect({ 0,0 }, { _width ,_height },1,RGB(0,0,0));
+}

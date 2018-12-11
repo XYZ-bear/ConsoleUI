@@ -46,6 +46,16 @@ public:
 	}
 	template<class T,class _Fn>
 	void add_timer(T *ob,int interval, _Fn func_) {
+		for (int i = 0; i<_pg.size(); i++)
+		{
+			auto time = _pg.top();
+			T *o = ((timer<T>*)_btim)->ob_;
+			auto fun = ((timer<T>*)_btim)->regist_func_;
+			if (fun == func_ && o == ob) {
+				return;
+			}
+		}
+
 		timer<T> *_tim = new timer<T>();
 		_tim->regist_func_ = func_;
 		_tim->ob_ = ob;
@@ -64,9 +74,18 @@ public:
 
 		_pg.push(_btim);
 	}
-	template<class _Fn>
-	void kill_timer(_Fn fn) {
-		//for(a)
+	template<class T,class _Fn>
+	void kill_timer(T *ob,_Fn fn) {
+		for(int i=0;i<_pg.size();i++)
+		{
+			auto time= _pg.top();
+			T *o = ((timer<T>*)_btim)->ob_;
+			auto fun = ((timer<T>*)_btim)->regist_func_;
+			if (fun == fn && o == ob) {
+				_pg.pop();
+				break;
+			}
+		}
 	}
 
 	void check_timer() {
