@@ -23,7 +23,7 @@ bool ccombox::update()
 			_gdi.draw_text(item.second.text, { 10,10 });
 		}
 	}
-	return true;
+	return cwbase::update();
 }
 
 void ccombox::click_in(c_point p) {

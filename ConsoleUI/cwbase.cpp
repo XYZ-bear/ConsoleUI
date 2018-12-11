@@ -35,7 +35,7 @@ int cwbase::get_console_height() {
 
 cgdi& cwbase::get_gdi() { return _gdi; }
 
-bool cwbase::create(c_point op, int width, int height, COLORREF bk_color) {
+bool cwbase::create(c_point op, int width, int height, cwbase *parent, COLORREF bk_color) {
 	_left_top = op;
 	_right_bottom = { op.x + width,op.y + height };
 	_width = width;
@@ -49,6 +49,8 @@ bool cwbase::create(c_point op, int width, int height, COLORREF bk_color) {
 	_gdi.set_rng(width, height);
 	_gdi.set_refer_point(_left_top);
 	_gdi.init();
+
+	_parent = parent;
 	return true;
 }
 
@@ -79,7 +81,6 @@ void cwbase::set_size(c_point op, int width, int height) {
 	_height = height;
 	_gdi.set_rng(width, height);
 	_gdi.set_refer_point(_left_top);
-	update();
 }
 
 c_point cwbase::get_point() {
@@ -92,4 +93,9 @@ c_point &cwbase::get_left_top() {
 
 void cwbase::erase_bk() {
 	_gdi.fill_rect({ 0,0 }, { _width ,_height },1,RGB(0,0,0));
+}
+
+void cwbase::update_parent() {
+	if (_parent)
+		BitBlt(_parent->get_gdi().buffer_hdc_, _gdi.refer_c_point_.x, _gdi.refer_c_point_.y, _gdi.width_, _gdi.height_, _gdi.buffer_hdc_, 0, 0, SRCCOPY);
 }

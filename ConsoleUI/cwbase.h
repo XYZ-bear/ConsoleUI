@@ -3,7 +3,6 @@
 #include "cgdi.h"
 #include <map>
 
-
 class cwbase
 {
 private:
@@ -24,6 +23,8 @@ protected:
 	COLORREF _mouse_in_color;
 
 	bool _is_focus;
+
+	cwbase *_parent;
 public:
 	cwbase();
 	virtual ~cwbase();
@@ -52,10 +53,22 @@ public:
 	void set_is_focus(bool is) { _is_focus = is; }
 
 	void erase_bk();
+
+	template<class T,class _Fn>
+	void set_timer(T *ob,int interval, _Fn func_) {
+		ctimer::instance().add_timer(ob, interval, func_);
+	}
+
+	template<class T, class _Fn>
+	void kill_timer(T *ob, _Fn func_) {
+		ctimer::instance().kill_timer(ob, func_);
+	}
+
+	void update_parent();
 public:
 	virtual bool init() = 0;
-	virtual bool update() = 0;
-	virtual bool create(c_point op, int width, int height, COLORREF _bk_color = RGB(255, 255, 255));
+	virtual bool update() { update_parent(); return true; };
+	virtual bool create( c_point op, int width, int height, cwbase *parent=nullptr, COLORREF _bk_color = RGB(255, 255, 255));
 	virtual void click_in(c_point p) {};
 	virtual void click_out(c_point p) {};
 	virtual void double_click(c_point p) {};

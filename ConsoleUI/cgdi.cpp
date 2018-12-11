@@ -74,7 +74,7 @@ void cgdi::draw_ellipse(c_point p, int len, COLORREF color) {
 }
 
 void cgdi::draw_text(string str, c_point p, int height, COLORREF color) {
-	RECT rect{ p.x, p.y, p.x + 8 * str.length(), p.y + height };
+	RECT rect{ p.x, p.y, p.x + height/2 * str.length(), p.y + height };
 
 	SetBkMode(buffer_hdc_, TRANSPARENT);
 	SetTextColor(buffer_hdc_, color);

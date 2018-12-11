@@ -49,6 +49,7 @@ public:
 	T_hint hint_t() { return hint_t_; }
 	T_align prejudge_align_v(c_point p);
 	T_align prejudge_align_h(c_point p);
+	void update_window();
 private:
 	template<class T, class _Fn>
 	void add_cmd(T *con, int id, cwbase *base, _Fn func) {
@@ -67,6 +68,7 @@ private:
 	c_point old_init_point;
 	c_point pre_point;
 	c_point cur_point;
+	c_point hint_point;
 	c_rect old_rect;
 	int header_height;
 	bool is_mouse_in_header;

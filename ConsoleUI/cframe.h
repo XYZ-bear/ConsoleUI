@@ -44,6 +44,11 @@ public:
 		if (window_list.size() > 0) {
 			active_window = *(--window_list.end());
 		}
+		for (auto &cwindow : window_list) {
+			if (cwindow) {
+				cwindow->update_window();
+			}
+		}
 		
 		while (1) {
 
@@ -51,12 +56,12 @@ public:
 			HBRUSH br = CreateSolidBrush(RGB(0, 0, 0));
 			FillRect(buffer_hdc, &rect,br);
 			DeleteObject(br);
-			for (auto &cwindow : window_list) {
-				if (cwindow) {
-					cwindow->update();
-				}
-			}
-
+			//for (auto &cwindow : window_list) {
+			//	if (cwindow) {
+			//		cwindow->update();
+			//	}
+			//}
+			//active_window->update();
 
 			INPUT_RECORD keyRec;
 			DWORD state = 0, res;
@@ -140,6 +145,8 @@ public:
 						active_window->input_key(keyRec.Event.KeyEvent.uChar.AsciiChar);
 					}
 				}
+
+				//active_window->update_window();
 			}
 			else
 				Sleep(1);
