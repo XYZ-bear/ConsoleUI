@@ -76,8 +76,9 @@ void cedit::input_key(char key) {
 			text_.pop_back();
 			spin_x_ -= 8;
 		}
+		return;
 	}
-	if (key >= 'A' && key <= 'z') {
+	if (key >= 'A' && key <= 'z'||key!=0) {
 		text_ += key;
 		spin_x_ += 8;
 	}
