@@ -3,6 +3,7 @@
 #include "cwbase.h"
 #include <list>
 #include <functional>
+#include "ctips.h"
 
 class base_brigde {
 public:
@@ -49,7 +50,7 @@ public:
 	T_hint hint_t() { return hint_t_; }
 	T_align prejudge_align_v(c_point p);
 	T_align prejudge_align_h(c_point p);
-	void update_window();
+	void update_window(bool redraw=false);
 private:
 	template<class T, class _Fn>
 	void add_cmd(T *con, int id, cwbase *base, _Fn func) {
@@ -80,6 +81,7 @@ private:
 	base_brigde *brigde_ = nullptr;
 	cwbase *point_ctr=nullptr;
 	cwbase *focus_ctr = nullptr;
+	ctips tips;
 public:
 	bool init();
 	bool update();
@@ -90,7 +92,7 @@ public:
 	void hint(c_point p);
 	void drag(c_point p);
 	void size_change(c_rect rect);
-	void input_key(char key);
+	void input_key(c_key key);
 public:
 	void close_click(cwbase *base, void* p);
 	void max_click(cwbase *base, void* p);

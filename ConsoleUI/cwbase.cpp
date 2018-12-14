@@ -91,11 +91,17 @@ c_point &cwbase::get_left_top() {
 	return _left_top;
 }
 
+c_point &cwbase::get_right_bottom() {
+	return _right_bottom;
+}
+
 void cwbase::erase_bk() {
 	_gdi.fill_rect({ 0,0 }, { _width ,_height },1,RGB(0,0,0));
 }
 
 void cwbase::update_parent() {
-	if (_parent)
+	if (_parent) {
 		BitBlt(_parent->get_gdi().buffer_hdc_, _gdi.refer_c_point_.x, _gdi.refer_c_point_.y, _gdi.width_, _gdi.height_, _gdi.buffer_hdc_, 0, 0, SRCCOPY);
+		_parent->get_gdi().set_change(true);
+	}
 }

@@ -18,11 +18,15 @@ protected:
 	cgdi _gdi;
 	T_align _align;
 	/*color*/
+	COLORREF _bk_color=RGB(0,0,0);
 	COLORREF _active_color;
 	COLORREF _color;
 	COLORREF _mouse_in_color;
 
+	bool _enable_focus = true;
 	bool _is_focus;
+	bool _is_show = true;
+	int _font_height = D_default_font_height;
 
 	cwbase *_parent;
 public:
@@ -31,6 +35,7 @@ public:
 	int get_width();
 	int get_height();
 	c_point &get_left_top();
+	c_point &get_right_bottom();
 	int get_console_width();
 	int get_console_height();
 	bool is_point_in(c_point p);
@@ -49,8 +54,17 @@ public:
 	void set_color(COLORREF color) { _active_color = color; _color = color; };
 	void set_mouse_in_color(COLORREF color) { _mouse_in_color = color; };
 
+	bool enable_focus() { return _enable_focus; }
+	void set_enable_focus(bool is) { _enable_focus = is; }
+
 	bool is_focus() { return _is_focus; }
 	void set_is_focus(bool is) { _is_focus = is; }
+
+	bool is_show() { return _is_show; }
+	void set_is_show(bool is) { _is_show = is; }
+
+	void set_font_height(int height) { _font_height = height; }
+	int get_font_size() { return _font_height; }
 
 	void erase_bk();
 
@@ -75,7 +89,7 @@ public:
 	virtual void mouse_move(c_point p){};
 	virtual void mouse_move_in(c_point p) {};
 	virtual void mouse_move_out(c_point p) {};
-	virtual void input_key(char key) {};
+	virtual void input_key(c_key key) {};
 	virtual void foucs() {};
 };
 

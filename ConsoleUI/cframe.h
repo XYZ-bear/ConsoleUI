@@ -33,6 +33,7 @@ public:
 		for (auto &cwindow : window_list) {
 			if (cwindow) {
 				cwindow->init();
+				cwindow->update_window(true);
 			}
 		}
 
@@ -44,11 +45,11 @@ public:
 		if (window_list.size() > 0) {
 			active_window = *(--window_list.end());
 		}
-		for (auto &cwindow : window_list) {
-			if (cwindow) {
-				cwindow->update_window();
-			}
-		}
+		//for (auto &cwindow : window_list) {
+		//	if (cwindow) {
+		//		cwindow->update_window();
+		//	}
+		//}
 		
 		while (1) {
 
@@ -142,7 +143,7 @@ public:
 				if (keyRec.EventType == KEY_EVENT) {
 					if (keyRec.Event.KeyEvent.bKeyDown)
 					{
-						active_window->input_key(keyRec.Event.KeyEvent.uChar.AsciiChar);
+						active_window->input_key(keyRec.Event.KeyEvent);
 					}
 				}
 
@@ -154,7 +155,7 @@ public:
 			ctimer::instance().check_timer();
 
 			for (auto &cwindow : window_list) {
-				if (cwindow) {
+				if (cwindow&&cwindow->get_gdi().get_change()) {
 					BitBlt(buffer_hdc, cwindow->get_gdi().refer_c_point_.x, cwindow->get_gdi().refer_c_point_.y, cwindow->get_gdi().width_, cwindow->get_gdi().height_, cwindow->get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
 				}
 			}

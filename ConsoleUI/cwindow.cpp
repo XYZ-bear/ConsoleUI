@@ -57,9 +57,15 @@ bool cwindow::init() {
 	add_child(comb);
 
 	cedit *edit = new cedit();
-	edit->create({ 200,100 }, 100, 60, this, RGB(255, 215, 0));
+	edit->create({ 200,100 }, 100, 200, this, RGB(255, 215, 0));
+	edit->set_style(T_multiline_edit);
 	add_child(edit);
 
+	tips.create({ 0,0 }, 100, 20, this);
+	tips.add_tip(close_button, "关闭");
+	tips.add_tip(edit, "编辑sfsfsds");
+	tips.add_tip(close_button3, "最小化fsdsssssssssssssssssssssdfsd");
+	add_child(&tips);
 	return true;
 }
 
@@ -86,20 +92,18 @@ bool cwindow::update() {
 		_gdi.draw_line({ _width - 4,_height - 4 }, { _width - 4 ,_height - 15 }, 1, RGB(255, 0, 0));
 	}
 
-	//for (auto &child : chidren_list) {
-	//	//if (child->get_gdi().get_change()) {
-	//		child->update();
-	//		BitBlt(get_gdi().buffer_hdc_, child->get_gdi().refer_c_point_.x, child->get_gdi().refer_c_point_.y, child->get_gdi().width_, child->get_gdi().height_, child->get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
-	//	//	child->get_gdi().set_change(false);
-	//	//}
-	//}
 	return true;
 }
 
-void cwindow::update_window() {
+void cwindow::update_window(bool redraw) {
 	update();
 	for (auto &child : chidren_list) {
-		child->update();
+		if (child->is_show()) {
+			if (redraw)
+				child->update();
+			else if (child->get_gdi().get_change())
+				BitBlt(get_gdi().buffer_hdc_, child->get_gdi().refer_c_point_.x, child->get_gdi().refer_c_point_.y, child->get_gdi().width_, child->get_gdi().height_, child->get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
+		}
 	}
 }
 
@@ -132,7 +136,8 @@ void cwindow::click_in(c_point p) {
 	bool is_top_click_ctr = false;
 	while (chidren_list.begin() != it) {
 		auto child = *(--it);
-		if (child&&child->is_point_in(p-get_left_top())&& is_top_click_ctr==false) {
+		if (child&&child->is_point_in(p-get_left_top())&&
+			is_top_click_ctr==false && child->enable_focus()) {
 			child->click_in(p);
 			call_func_(D_mouse_click_event, child,&p);
 			child->set_is_focus(true);
@@ -181,6 +186,12 @@ void cwindow::mouse_move(c_point p) {
 			point_ctr = nullptr;
 		}
 	}
+
+	if (point_ctr) {
+		tips.show_tip(point_ctr, client_p);
+	}
+	else
+		tips.set_is_show(false);
 }
 
 void cwindow::close_click(cwbase *base, void* p) {
@@ -215,14 +226,7 @@ void cwindow::double_click(c_point p) {
 
 void cwindow::hint(c_point p) {
 	hint_point = get_client_point(p);
-	update();
-	for (auto &child : chidren_list) {
-	//if (child->get_gdi().get_change()) {
-		//child->update();
-		BitBlt(get_gdi().buffer_hdc_, child->get_gdi().refer_c_point_.x, child->get_gdi().refer_c_point_.y, child->get_gdi().width_, child->get_gdi().height_, child->get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
-	//	child->get_gdi().set_change(false);
-	}
-	//update_window();
+	update_window();
 }
 
 void cwindow::drag(c_point p) {
@@ -273,7 +277,7 @@ void cwindow::size_change(c_rect rect) {
 	}
 }
 
-void cwindow::input_key(char key) {
+void cwindow::input_key(c_key key) {
 	if (focus_ctr) {
 		if (focus_ctr->is_focus()) {
 			focus_ctr->input_key(key);

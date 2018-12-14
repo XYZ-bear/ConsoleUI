@@ -3,6 +3,10 @@
 /*mouse_event*/
 #define D_mouse_click_event 1
 
+
+/*default init*/
+#define D_default_font_height 16       //width=height/2
+
 /*hint_type*/
 enum T_hint
 {
@@ -17,7 +21,8 @@ enum T_ctr_type
 {
 	T_window,
 	T_button,
-	T_edit
+	T_edit,
+	T_tips
 };
 
 /*align*/
@@ -30,6 +35,9 @@ enum T_align
 	T_h_align_right = 0x10,
 	T_h_align_center = 0x20,
 };
+
+typedef _KEY_EVENT_RECORD c_key;
+
 
 struct c_point {
 	long x;
