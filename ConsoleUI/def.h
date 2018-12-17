@@ -22,7 +22,8 @@ enum T_ctr_type
 	T_window,
 	T_button,
 	T_edit,
-	T_tips
+	T_tips,
+	T_scroll
 };
 
 /*align*/

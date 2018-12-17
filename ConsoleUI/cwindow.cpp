@@ -6,6 +6,7 @@
 #include "cmenu.h"
 #include "cedit.h"
 #include "ctimer.h"
+#include "cscroll.h"
 
 cwindow::cwindow()
 {
@@ -66,6 +67,10 @@ bool cwindow::init() {
 	tips.add_tip(edit, "±à¼­sfsfsds");
 	tips.add_tip(close_button3, "×îĞ¡»¯fsdsssssssssssssssssssssdfsd");
 	add_child(&tips);
+
+	cscroll *scroll = new cscroll();
+	scroll->create({ 310,30 }, 20, 200, this);
+	add_child(scroll);
 	return true;
 }
 

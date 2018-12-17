@@ -25,13 +25,14 @@ bool cedit::update()
 	else {
 		_gdi.draw_text(text_, { 2,2 }, _font_height);
 
-		size_t pre_pos = 0;
-		size_t old_pos = 0;
-		while (1) {
-			//pos = text_.find_first_of('\r', pos);
-			//_gdi.draw_text(text_.substr(0, pos - 1), { 2,ypos }, _font_height);
-			//if(pos==-1)
-		}
+		//size_t pre_pos = 0;
+		//size_t old_pos = 0;
+		//while (1) {
+		//	
+		//	//pos = text_.find_first_of('\r', pos);
+		//	//_gdi.draw_text(text_.substr(0, pos - 1), { 2,ypos }, _font_height);
+		//	//if(pos==-1)
+		//}
 		//size_t pos = 0; 
 		//text_.substr(0, pos);
 		//int ypos = 2;

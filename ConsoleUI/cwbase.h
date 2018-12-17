@@ -91,5 +91,6 @@ public:
 	virtual void mouse_move_out(c_point p) {};
 	virtual void input_key(c_key key) {};
 	virtual void foucs() {};
+	virtual void drag(c_point p) {};
 };
 

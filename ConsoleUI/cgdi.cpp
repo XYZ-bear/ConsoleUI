@@ -56,6 +56,15 @@ void cgdi::fill_rect(c_point p1, c_point p2, int width, COLORREF color) {
 	set_change(true);
 }
 
+void cgdi::fill_rect(c_rect r1, COLORREF color) {
+	RECT rect{ r1.p.x,r1.p.y,r1.p.x + r1.width,r1.p.y + r1.height };
+	HBRUSH br = CreateSolidBrush(color);
+	SelectObject(buffer_hdc_, br);
+	FillRect(buffer_hdc_, &rect, br);
+	DeleteObject(br);
+	set_change(true);
+}
+
 void cgdi::draw_ellipse(c_point p, int len, COLORREF color) {
 	HBRUSH hBrush = CreateSolidBrush(color);
 	HBRUSH hOldBrush = (HBRUSH)SelectObject(buffer_hdc_, hBrush);
