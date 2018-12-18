@@ -2,6 +2,7 @@
 
 /*mouse_event*/
 #define D_mouse_click_event 1
+#define D_scroll_event 2
 
 
 /*default init*/

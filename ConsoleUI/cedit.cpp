@@ -46,6 +46,8 @@ bool cedit::update()
 		//	ypos += _font_height;
 		//}
 	}
+	if (scroll_)
+		scroll_->update();
 	return cwbase::update();
 }
 
@@ -53,6 +55,7 @@ void cedit::click_in(c_point p) {
 	//ctimer::instance().add_timer(this, 500, &cedit::test);
 	test();
 	set_timer(this,500, &cedit::test);
+	scroll_->click_in(p);
 }
 
 void cedit::click_out(c_point p) {
@@ -66,6 +69,13 @@ bool cedit::init() {
 	if (style_ == T_singleline_edit) {
 		_font_height = _height - 4;
 	}
+
+	scroll_ = new cscroll();
+	scroll_->create({ 50,0 }, 12, 200, this);
+	scroll_->set_bk_color(RGB(62, 62, 62));
+	scroll_->set_bar_color(RGB(104, 104, 104));
+	scroll_->set_bar_drag_color(RGB(200, 200, 200));
+	scroll_->add_cmd(this, D_scroll_event, &cedit::on_scroll);
 	return true;
 }
 
@@ -75,10 +85,11 @@ void cedit::double_click(c_point p) {
 
 void cedit::mouse_move_in(c_point p) {
 	_active_color = _mouse_in_color;
+	scroll_->mouse_move_in(get_client_point(p));
 }
 
 void cedit::mouse_move_out(c_point p) {
-	_active_color = _color;
+	_active_color = _bk_color;
 }
 
 void cedit::test() {
@@ -140,4 +151,8 @@ void cedit::input_key(c_key key) {
 
 	update:
 	update();
+}
+
+void cedit::on_scroll(void *data) {
+	_bk_color = RGB(255, 0, 0);
 }

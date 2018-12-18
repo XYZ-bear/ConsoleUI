@@ -20,7 +20,6 @@ protected:
 	/*color*/
 	COLORREF _bk_color=RGB(0,0,0);
 	COLORREF _active_color;
-	COLORREF _color;
 	COLORREF _mouse_in_color;
 
 	bool _enable_focus = true;
@@ -51,7 +50,7 @@ public:
 	void set_ctr_type(T_ctr_type ctr_type) { ctr_type_ = ctr_type; }
 	T_ctr_type get_ctr_type() { return ctr_type_ ; }
 
-	void set_color(COLORREF color) { _active_color = color; _color = color; };
+	void set_bk_color(COLORREF color) { _active_color = color; _bk_color = color; };
 	void set_mouse_in_color(COLORREF color) { _mouse_in_color = color; };
 
 	bool enable_focus() { return _enable_focus; }
@@ -65,6 +64,10 @@ public:
 
 	void set_font_height(int height) { _font_height = height; }
 	int get_font_size() { return _font_height; }
+
+	c_point get_client_point(c_point p) {
+		return p - _left_top;
+	}
 
 	void erase_bk();
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "cwbase.h"
+#include "cevent.h"
 
 enum T_scroll_style
 {
@@ -8,7 +9,8 @@ enum T_scroll_style
 };
 
 class cscroll :
-	public cwbase
+	public cwbase,
+	public cevent
 {
 public:
 	cscroll();
@@ -20,14 +22,28 @@ public:
 	void click_out(c_point p);
 	void double_click(c_point p);
 	void set_style(T_scroll_style style) { style_ = style; };
-	void set_spin_color(COLORREF color) { spin_color_ = color; };
+	void set_bar_color(COLORREF color) { bar_color_ = color; };
+	void set_bar_drag_color(COLORREF color) { bar_drag_color_ = color; };
 	T_scroll_style get_style() { return style_; };
+	void set_one_step(float step) { one_step_ = step; };
+	void scroll_to(int pos);
+	void set_range(int min, int max) { min_pos_ = min; max_pos_ = max; };
 private:
-	COLORREF spin_color_ = RGB(255, 255, 255);
+	void scroll_to_(int xy);
+private:
 	T_scroll_style style_= T_h_scroll;
 	c_rect scroll_bar_;
+	COLORREF bar_color_;
+	COLORREF bar_drag_color_;
+	COLORREF bar_active_color_;
+	int scroll_bar_offset = 3;
+	c_point old_point_;
+	float one_step_ = 0.3f;
+	int max_pos_ = 100;
+	int min_pos_ = 0;
 public:
 	void mouse_move_in(c_point p);
 	void mouse_move_out(c_point p);
+	void drag(c_point p);
 };
 

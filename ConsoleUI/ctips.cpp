@@ -34,7 +34,7 @@ void ctips::show_tip(cwbase *bind_ob, c_point p) {
 			point.x = _parent->get_width() - _width;
 			set_point(point);
 		}
-		_gdi.fill_rect({ 0,0 }, { _width ,_height },1,RGB(210,210,210));
+		_gdi.fill_rect({ 0,0 }, { _width ,_height },RGB(210,210,210));
 		_gdi.draw_text(text_[bind_ob], { 4,2 }, D_default_font_height,RGB(100,100,100));
 		cwbase::update();
 	}

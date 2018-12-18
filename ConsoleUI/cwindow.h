@@ -46,7 +46,6 @@ public:
 		add_cmd(this,id,base,func);
 	}
 	bool is_close() { return is_close_; }
-	c_point get_client_point(c_point p);
 	T_hint hint_t() { return hint_t_; }
 	T_align prejudge_align_v(c_point p);
 	T_align prejudge_align_h(c_point p);

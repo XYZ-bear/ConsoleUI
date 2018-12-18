@@ -54,6 +54,15 @@
     <ClInclude Include="ctimer.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ctips.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cscroll.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cevent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -90,6 +99,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ctimer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ctips.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cscroll.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

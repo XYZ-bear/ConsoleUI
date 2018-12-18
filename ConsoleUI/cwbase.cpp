@@ -42,7 +42,7 @@ bool cwbase::create(c_point op, int width, int height, cwbase *parent, COLORREF 
 	_height = height;
 
 	_active_color = bk_color;
-	_color = bk_color;
+	_bk_color = bk_color;
 	_mouse_in_color = bk_color;
 
 	_align = T_v_align_left;
@@ -96,7 +96,7 @@ c_point &cwbase::get_right_bottom() {
 }
 
 void cwbase::erase_bk() {
-	_gdi.fill_rect({ 0,0 }, { _width ,_height },1,RGB(0,0,0));
+	_gdi.fill_rect({ 0,0 }, { _width ,_height },RGB(0,0,0));
 }
 
 void cwbase::update_parent() {

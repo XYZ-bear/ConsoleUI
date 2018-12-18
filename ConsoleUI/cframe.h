@@ -82,6 +82,7 @@ public:
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
 							if (active_window) {
 								active_window->drag({ p.x ,p.y });
+								continue;
 							}
 						}
 						if (active_window) {

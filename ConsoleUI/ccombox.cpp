@@ -15,7 +15,7 @@ ccombox::~ccombox()
 
 bool ccombox::update()
 {
-	_gdi.fill_rect({ 0,0 }, { comb_width_,comb_height_ }, 1, _color);
+	_gdi.fill_rect({ 0,0 }, { comb_width_,comb_height_ }, _bk_color);
 	_gdi.draw_text(root.text, { 0,0 });
 
 	if (active_item) {
@@ -46,7 +46,7 @@ void ccombox::mouse_move_in(c_point p) {
 }
 
 void ccombox::mouse_move_out(c_point p) {
-	_active_color = _color;
+	_active_color = _bk_color;
 }
 
 void ccombox::update_item(item roo){

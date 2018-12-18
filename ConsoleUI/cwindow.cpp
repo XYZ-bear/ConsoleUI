@@ -62,15 +62,23 @@ bool cwindow::init() {
 	edit->set_style(T_multiline_edit);
 	add_child(edit);
 
+	cscroll *scroll = new cscroll();
+	scroll->create({ 310,30 }, 12, 200, this);
+	scroll->set_bk_color(RGB(62,62,62));
+	scroll->set_bar_color(RGB(104,104,104));
+	scroll->set_bar_drag_color(RGB(200,200,200));
+	add_child(scroll);
+
+	cscroll *scrollv = new cscroll();
+	scrollv->create({ 100,300 }, 200, 12, this);
+	scrollv->set_style(T_v_scroll);
+	add_child(scrollv);
+
 	tips.create({ 0,0 }, 100, 20, this);
 	tips.add_tip(close_button, "关闭");
 	tips.add_tip(edit, "编辑sfsfsds");
 	tips.add_tip(close_button3, "最小化fsdsssssssssssssssssssssdfsd");
 	add_child(&tips);
-
-	cscroll *scroll = new cscroll();
-	scroll->create({ 310,30 }, 20, 200, this);
-	add_child(scroll);
 	return true;
 }
 
@@ -251,7 +259,7 @@ void cwindow::drag(c_point p) {
 			}
 		}
 	}
-	//if (hint_t_ != T_hint_nono) {
+	if (hint_t_ != T_hint_nono) {
 		old_rect.width = _width;
 		old_rect.height = _height;
 		auto move = p - pre_point;
@@ -266,11 +274,12 @@ void cwindow::drag(c_point p) {
 		}
 		size_change(old_rect);
 		update_window();
-	//}
-}
+	}
 
-c_point cwindow::get_client_point(c_point p) {
-	return p - _left_top;
+	if (point_ctr)
+		point_ctr->drag(p);
+
+	pre_point = p;
 }
 
 void cwindow::size_change(c_rect rect) {
