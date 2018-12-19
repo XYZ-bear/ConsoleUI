@@ -15,7 +15,7 @@ cmenu::~cmenu()
 
 bool cmenu::update()
 {
-	_gdi.fill_rect({ 0,0 }, { _width,_height }, 1, _color);
+	_gdi.fill_rect({ 0,0 }, { _width,_height }, _bk_color);
 
 	_gdi.draw_text(root.text, { 0,0 });
 
@@ -47,7 +47,7 @@ void cmenu::mouse_move_in(c_point p) {
 }
 
 void cmenu::mouse_move_out(c_point p) {
-	_active_color = _color;
+	_active_color = _bk_color;
 }
 
 void cmenu::update_item(item *roo,int height){

@@ -1,5 +1,6 @@
 #pragma once
 #include "cwbase.h"
+#include "cscroll.h"
 
 enum T_edit_style
 {
@@ -24,6 +25,8 @@ public:
 	void set_style(T_edit_style style) { style_ = style; };
 	void set_spin_color(COLORREF color) { spin_color_ = color; };
 	T_edit_style get_style() { return style_; };
+
+	void on_scroll(void *data);
 private:
 	bool is_spin;
 	int spin_x_;
@@ -33,6 +36,7 @@ private:
 	COLORREF spin_color_ = RGB(255, 255, 255);
 	string text_;
 	T_edit_style style_= T_singleline_edit;
+	cscroll *scroll_ = nullptr;
 public:
 	void mouse_move_in(c_point p);
 	void mouse_move_out(c_point p);

@@ -150,10 +150,12 @@
     <ClInclude Include="cbutton.h" />
     <ClInclude Include="ccombox.h" />
     <ClInclude Include="cedit.h" />
+    <ClInclude Include="cevent.h" />
     <ClInclude Include="cframe.h" />
     <ClInclude Include="cgdi.h" />
     <ClInclude Include="cmenu.h" />
     <ClInclude Include="cmouse.h" />
+    <ClInclude Include="cscroll.h" />
     <ClInclude Include="ctimer.h" />
     <ClInclude Include="ctips.h" />
     <ClInclude Include="cwbase.h" />
@@ -171,6 +173,7 @@
     <ClCompile Include="cmenu.cpp" />
     <ClCompile Include="cmouse.cpp" />
     <ClCompile Include="ConsoleUI.cpp" />
+    <ClCompile Include="cscroll.cpp" />
     <ClCompile Include="ctimer.cpp" />
     <ClCompile Include="ctips.cpp" />
     <ClCompile Include="cwbase.cpp" />

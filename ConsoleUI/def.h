@@ -1,11 +1,21 @@
 #pragma once
 
-/*mouse_event*/
-#define D_mouse_click_event 1
-
-
 /*default init*/
 #define D_default_font_height 16       //width=height/2
+
+/*event define*/
+enum T_ctr_event {
+	T_click_in_event,
+	T_click_out_event,
+	T_double_click_event,
+	T_mouse_move_event,
+	T_mouse_move_in_event,
+	T_mouse_move_out_event,
+	T_input_key,
+	T_focus,
+	T_drag_event,
+	T_scroll_event
+};
 
 /*hint_type*/
 enum T_hint
@@ -19,10 +29,12 @@ enum T_hint
 /*control type*/
 enum T_ctr_type
 {
+	T_frame,
 	T_window,
 	T_button,
 	T_edit,
-	T_tips
+	T_tips,
+	T_scroll
 };
 
 /*align*/

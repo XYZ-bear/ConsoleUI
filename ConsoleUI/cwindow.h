@@ -46,7 +46,6 @@ public:
 		add_cmd(this,id,base,func);
 	}
 	bool is_close() { return is_close_; }
-	c_point get_client_point(c_point p);
 	T_hint hint_t() { return hint_t_; }
 	T_align prejudge_align_v(c_point p);
 	T_align prejudge_align_h(c_point p);
@@ -94,7 +93,7 @@ public:
 	void size_change(c_rect rect);
 	void input_key(c_key key);
 public:
-	void close_click(cwbase *base, void* p);
-	void max_click(cwbase *base, void* p);
+	void close_click( void* p);
+	void max_click( void* p);
 };
 

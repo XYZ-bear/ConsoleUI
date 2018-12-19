@@ -47,11 +47,20 @@ void cgdi::draw_frame_rect(c_point p1, c_point p2, int width, COLORREF color, in
 	set_change(true);
 }
 
-void cgdi::fill_rect(c_point p1, c_point p2, int width, COLORREF color) {
+void cgdi::fill_rect(c_point p1, c_point p2, COLORREF color) {
 	RECT rect{ p1.x,p1.y,p2.x,p2.y };
 	HBRUSH br = CreateSolidBrush(color);
 	SelectObject(buffer_hdc_,br);
 	FillRect(buffer_hdc_,&rect, br);
+	DeleteObject(br);
+	set_change(true);
+}
+
+void cgdi::fill_rect(c_rect r1, COLORREF color) {
+	RECT rect{ r1.p.x,r1.p.y,r1.p.x + r1.width,r1.p.y + r1.height };
+	HBRUSH br = CreateSolidBrush(color);
+	SelectObject(buffer_hdc_, br);
+	FillRect(buffer_hdc_, &rect, br);
 	DeleteObject(br);
 	set_change(true);
 }

@@ -57,6 +57,15 @@
     <ClInclude Include="ctips.h">
       <Filter>头文件</Filter>
     </ClInclude>
+<<<<<<< HEAD
+=======
+    <ClInclude Include="cscroll.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cevent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+>>>>>>> d055b7b7430407263ada8751c61d1aac74eacfa9
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -98,5 +107,11 @@
     <ClCompile Include="ctips.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+<<<<<<< HEAD
+=======
+    <ClCompile Include="cscroll.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+>>>>>>> d055b7b7430407263ada8751c61d1aac74eacfa9
   </ItemGroup>
 </Project>

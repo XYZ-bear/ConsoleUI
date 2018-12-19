@@ -33,38 +33,29 @@ bool cedit::update()
 		spin_y_ = 0;
 		spin_x_ = 0;
 		while (1) {
-			pre_pos = text_.find_first_of('\r', old_pos+1);
-			
+			pre_pos = text_.find_first_of('\r', old_pos + 1);
+
 			if (pre_pos == -1) {
-				_gdi.draw_text(text_.substr(old_pos + 1, text_.size() - old_pos -1), { 2,ypos }, _font_height);
-				spin_x_ = (text_.size() - old_pos- 1)*_font_height / 2+2;
+				_gdi.draw_text(text_.substr(old_pos + 1, text_.size() - old_pos - 1), { 2,ypos }, _font_height);
+				spin_x_ = (text_.size() - old_pos - 1)*_font_height / 2 + 2;
 				break;
 			}
 			else {
-				_gdi.draw_text(text_.substr(old_pos + 1, pre_pos- old_pos-1), { 2,ypos }, _font_height);
+				_gdi.draw_text(text_.substr(old_pos + 1, pre_pos - old_pos - 1), { 2,ypos }, _font_height);
 				old_pos = pre_pos;
 				ypos += _font_height;
 				spin_y_ += _font_height;
 				//int len = (pre_pos - old_pos - 1);
 				//if(len<=0)
-				spin_x_ = (pre_pos - old_pos - 1)*_font_height/2;
+				spin_x_ = (pre_pos - old_pos - 1)*_font_height / 2;
 			}
 		}
 		spin_x_ += spin_x_off_;
 		spin_y_ += spin_y_off_;
-		//size_t pos = 0; 
-		//text_.substr(0, pos);
-		//int ypos = 2;sfsf\rfsf
-		//do {
-		//	pos = text_.find_first_of('\r', pos);
-		//	_gdi.draw_text(text_.substr(0, pos-1), { 2,ypos }, _font_height);
-		//	ypos += _font_height;
-		//} while (pos != -1);
-		//while (pos = text_.find_first_of('\r', pos) != -1) {
-		//	_gdi.draw_text(text_.substr(0, pos), { 2,ypos }, _font_height);
-		//	ypos += _font_height;
-		//}
 	}
+
+	if (scroll_)
+		scroll_->update();
 	return cwbase::update();
 }
 
@@ -72,6 +63,7 @@ void cedit::click_in(c_point p) {
 	//ctimer::instance().add_timer(this, 500, &cedit::test);
 	test();
 	set_timer(this,500, &cedit::test);
+	scroll_->click_in(p);
 }
 
 void cedit::click_out(c_point p) {
@@ -85,6 +77,13 @@ bool cedit::init() {
 	if (style_ == T_singleline_edit) {
 		_font_height = _height - 4;
 	}
+
+	scroll_ = new cscroll();
+	scroll_->create({ 50,0 }, 12, 200, this);
+	scroll_->set_bk_color(RGB(62, 62, 62));
+	scroll_->set_bar_color(RGB(104, 104, 104));
+	scroll_->set_bar_drag_color(RGB(200, 200, 200));
+	scroll_->add_cmd(this, T_scroll_event, &cedit::on_scroll);
 	return true;
 }
 
@@ -97,7 +96,7 @@ void cedit::mouse_move_in(c_point p) {
 }
 
 void cedit::mouse_move_out(c_point p) {
-	_active_color = _color;
+	_active_color = _bk_color;
 }
 
 void cedit::test() {
@@ -167,4 +166,8 @@ void cedit::input_key(c_key key) {
 
 	update:
 	update();
+}
+
+void cedit::on_scroll(void *data) {
+	_bk_color = RGB(255, 0, 0);
 }
