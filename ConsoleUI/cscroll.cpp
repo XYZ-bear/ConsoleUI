@@ -96,5 +96,5 @@ void cscroll::scroll_to_(int xy) {
 		scroll_bar_.p.x = xy;
 	}
 	if (call_func_)
-		call_func_(D_scroll_event, nullptr);
+		call_func_(T_scroll_event, nullptr);
 }

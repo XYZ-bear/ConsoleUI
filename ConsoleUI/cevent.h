@@ -1,6 +1,6 @@
 #pragma once
 
-#include <list>
+#include <map>
 #include <functional>
 
 class base_event_brigde {
@@ -28,7 +28,7 @@ public:
 class cevent
 {
 public:
-	cevent() {};
+	cevent() { };
 	~cevent() {};
 public:
 	template<class T, class _Fn>
@@ -44,5 +44,5 @@ public:
 private:
 	base_event_brigde * brigde_ = nullptr;
 protected:
-	function<void(int id, void* data)> call_func_=nullptr;
+	function<void(int id, void* data)> call_func_ = [this](int id, void *data) {};
 };

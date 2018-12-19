@@ -1,9 +1,11 @@
 #pragma once
 
 #include "cgdi.h"
+#include "cevent.h"
 #include <map>
+#include <list>
 
-class cwbase
+class cwbase:public cevent
 {
 private:
 	HANDLE m_console_hand_;
@@ -27,7 +29,8 @@ protected:
 	bool _is_show = true;
 	int _font_height = D_default_font_height;
 
-	cwbase *_parent;
+	cwbase *_parent = nullptr;
+	list<cwbase*> _childrend;
 public:
 	cwbase();
 	virtual ~cwbase();
@@ -81,19 +84,21 @@ public:
 		ctimer::instance().kill_timer(ob, func_);
 	}
 
+	list<cwbase*> &get_children() { return _childrend; }
+
 	void update_parent();
 public:
 	virtual bool init() = 0;
 	virtual bool update() { update_parent(); return true; };
 	virtual bool create( c_point op, int width, int height, cwbase *parent=nullptr, COLORREF _bk_color = RGB(255, 255, 255));
-	virtual void click_in(c_point p) {};
-	virtual void click_out(c_point p) {};
-	virtual void double_click(c_point p) {};
-	virtual void mouse_move(c_point p){};
-	virtual void mouse_move_in(c_point p) {};
-	virtual void mouse_move_out(c_point p) {};
-	virtual void input_key(c_key key) {};
-	virtual void foucs() {};
-	virtual void drag(c_point p) {};
+	virtual void click_in(c_point p) { call_func_(T_click_in_event,&p); };
+	virtual void click_out(c_point p) { call_func_(T_click_out_event, &p); };
+	virtual void double_click(c_point p) { call_func_(T_double_click_event, &p); };
+	virtual void mouse_move(c_point p){ call_func_(T_mouse_move_event, &p); };
+	virtual void mouse_move_in(c_point p) { call_func_(T_mouse_move_in_event, &p); };
+	virtual void mouse_move_out(c_point p) { call_func_(T_mouse_move_out_event, &p); };
+	virtual void input_key(c_key key) { call_func_(T_input_key, &key); };
+	virtual void foucs() { call_func_(T_focus, nullptr); };
+	virtual void drag(c_point p) { call_func_(T_drag_event, &p); };
 };
 

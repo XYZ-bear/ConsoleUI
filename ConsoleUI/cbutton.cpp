@@ -36,9 +36,11 @@ void cbutton::double_click(c_point p) {
 void cbutton::mouse_move_in(c_point p) {
 	_active_color = _mouse_in_color;
 	update();
+	cwbase::mouse_move_out(p);
 }
 
 void cbutton::mouse_move_out(c_point p) {
 	_active_color = _bk_color;
 	update();
+	cwbase::mouse_move_out(p);
 }

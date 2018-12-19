@@ -9,8 +9,7 @@ enum T_scroll_style
 };
 
 class cscroll :
-	public cwbase,
-	public cevent
+	public cwbase
 {
 public:
 	cscroll();

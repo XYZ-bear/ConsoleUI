@@ -75,7 +75,7 @@ bool cedit::init() {
 	scroll_->set_bk_color(RGB(62, 62, 62));
 	scroll_->set_bar_color(RGB(104, 104, 104));
 	scroll_->set_bar_drag_color(RGB(200, 200, 200));
-	scroll_->add_cmd(this, D_scroll_event, &cedit::on_scroll);
+	scroll_->add_cmd(this, T_scroll_event, &cedit::on_scroll);
 	return true;
 }
 
@@ -85,7 +85,6 @@ void cedit::double_click(c_point p) {
 
 void cedit::mouse_move_in(c_point p) {
 	_active_color = _mouse_in_color;
-	scroll_->mouse_move_in(get_client_point(p));
 }
 
 void cedit::mouse_move_out(c_point p) {

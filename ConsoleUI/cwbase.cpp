@@ -51,6 +51,9 @@ bool cwbase::create(c_point op, int width, int height, cwbase *parent, COLORREF 
 	_gdi.init();
 
 	_parent = parent;
+
+	if (_parent)
+		_parent->_childrend.push_back(this);
 	return true;
 }
 
