@@ -23,7 +23,7 @@
     <ProjectGuid>{26B2E4FF-A638-448D-8640-155ABABA25B0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ConsoleUI</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -155,6 +155,7 @@
     <ClInclude Include="cmenu.h" />
     <ClInclude Include="cmouse.h" />
     <ClInclude Include="ctimer.h" />
+    <ClInclude Include="ctips.h" />
     <ClInclude Include="cwbase.h" />
     <ClInclude Include="cwindow.h" />
     <ClInclude Include="def.h" />
@@ -171,6 +172,7 @@
     <ClCompile Include="cmouse.cpp" />
     <ClCompile Include="ConsoleUI.cpp" />
     <ClCompile Include="ctimer.cpp" />
+    <ClCompile Include="ctips.cpp" />
     <ClCompile Include="cwbase.cpp" />
     <ClCompile Include="cwindow.cpp" />
     <ClCompile Include="stdafx.cpp">
