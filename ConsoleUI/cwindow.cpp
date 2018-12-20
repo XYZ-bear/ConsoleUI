@@ -34,13 +34,14 @@ bool cwindow::init() {
 	close_button->set_type(T_circle_button);
 	close_button->set_mouse_in_color(RGB(255, 0, 0));
 	close_button->add_cmd(this, T_click_in_event, &cwindow::close_click);
+	close_button->set_tip("关闭");
 	//regist_control_call(D_mouse_click_event, close_button, &cwindow::close_click);
 
 	cbutton *close_button2 = new cbutton();;
 	close_button2->create({ _width - 45,5 }, 15, 15, this, RGB(0, 128, 0));
 	close_button2->set_type(T_circle_button);
 	close_button2->add_cmd(this, T_click_in_event, &cwindow::max_click);
-	//regist_control_call(D_mouse_click_event, close_button2, &cwindow::max_click);
+	////regist_control_call(D_mouse_click_event, close_button2, &cwindow::max_click);
 
 	cbutton *close_button3 = new cbutton();
 	close_button3->create({ _width - 65,5 }, 15, 15, this, RGB(255, 215, 0));
@@ -65,18 +66,16 @@ bool cwindow::init() {
 	scroll->set_bk_color(RGB(62,62,62));
 	scroll->set_bar_color(RGB(104,104,104));
 	scroll->set_bar_drag_color(RGB(200,200,200));
+	scroll->set_tip("滚滚洞");
 
 	//cscroll *scrollv = new cscroll();
 	//scrollv->create({ 100,300 }, 200, 12, this);
 	//scrollv->set_style(T_v_scroll);
 	//add_child(scrollv);
 
-	tips.create({ 0,0 }, 100, 20, this);
-	tips.add_tip(close_button, "关闭");
-	tips.add_tip(edit, "编辑sfsfsds");
-	tips.add_tip(close_button3, "最小化fsdsssssssssssssssssssssdfsd");
+	//tips.create({ 0,0 }, 100, 20, this);
 
-	return true;
+	return cwbase::init();
 }
 
 bool cwindow::update() {
@@ -102,7 +101,7 @@ bool cwindow::update() {
 		_gdi.draw_line({ _width - 4,_height - 4 }, { _width - 4 ,_height - 15 }, 1, RGB(255, 0, 0));
 	}
 
-	return true;
+	return cwbase::update();
 }
 
 void cwindow::update_window(bool redraw) {
@@ -184,18 +183,18 @@ void cwindow::mouse_move(c_point p) {
 	hint(p);
 
 	auto client_p = get_client_point(p);
-	if (auto t = point_in_ctr(p)) {
-		if (!point_ctr) {
-			t->mouse_move_in(client_p);
-			point_ctr = t;
-		}
-	}
-	else {
-		if (point_ctr) {
-			point_ctr->mouse_move_out(client_p);
-			point_ctr = nullptr;
-		}
-	}
+	//if (auto t = point_in_ctr(p)) {
+	//	if (!point_ctr) {
+	//		t->mouse_move_in(client_p);
+	//		point_ctr = t;
+	//	}
+	//}
+	//else {
+	//	if (point_ctr) {
+	//		point_ctr->mouse_move_out(client_p);
+	//		point_ctr = nullptr;
+	//	}
+	//}
 
 	if (point_ctr) {
 		tips.show_tip(point_ctr, client_p);

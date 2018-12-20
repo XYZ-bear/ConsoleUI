@@ -29,7 +29,6 @@ public:
 	void update_item(item *roo,int height);
 	void check_active_item(item *roo, c_point p,int height);
 	bool update();
-	bool init();
 	void click_in(c_point p);
 	void double_click(c_point p);
 public:

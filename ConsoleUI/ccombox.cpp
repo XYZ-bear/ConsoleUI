@@ -33,10 +33,6 @@ void ccombox::click_in(c_point p) {
 	//}
 }
 
-bool ccombox::init() {
-	return true;
-}
-
 void ccombox::double_click(c_point p) {
 
 }

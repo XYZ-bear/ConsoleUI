@@ -35,6 +35,23 @@ int cwbase::get_console_height() {
 
 cgdi& cwbase::get_gdi() { return _gdi; }
 
+bool cwbase::init() {
+	for (auto child : _childrend) {
+		child->init();
+	}
+	return true;
+}
+
+bool cwbase::update() {
+	if (_is_show) {
+		for (auto child : _childrend) {
+			child->update();
+		}
+		update_parent();
+	}
+	return true;
+}
+
 bool cwbase::create(c_point op, int width, int height, cwbase *parent, COLORREF bk_color) {
 	_left_top = op;
 	_right_bottom = { op.x + width,op.y + height };
@@ -52,8 +69,9 @@ bool cwbase::create(c_point op, int width, int height, cwbase *parent, COLORREF 
 
 	_parent = parent;
 
-	if (_parent)
+	if (_parent) {
 		_parent->_childrend.push_back(this);
+	}
 	return true;
 }
 
@@ -105,6 +123,49 @@ void cwbase::erase_bk() {
 void cwbase::update_parent() {
 	if (_parent) {
 		BitBlt(_parent->get_gdi().buffer_hdc_, _gdi.refer_c_point_.x, _gdi.refer_c_point_.y, _gdi.width_, _gdi.height_, _gdi.buffer_hdc_, 0, 0, SRCCOPY);
-		_parent->get_gdi().set_change(true);
+		//_parent->get_gdi().set_change(true);
 	}
+}
+
+void cwbase::move_child_to_end(cwbase* ctr) {
+	auto it = _childrend.end();
+	while (_childrend.begin() != it) {
+		auto child = *(--it);
+		if (ctr == child) {
+			_childrend.erase(it);
+			_childrend.push_back(ctr);
+			break;
+		}
+	}
+}
+
+void cwbase::do_event(T_ctr_event id, void *data) {
+	if (!pre_event(id, data))
+		return;
+	switch (id)
+	{
+	case T_click_in_event:click_in(*(c_point*)data);
+		break;
+	case T_click_out_event:click_out(*(c_point*)data);
+		break;
+	case T_double_click_event:double_click(*(c_point*)data);
+		break;
+	case T_mouse_move_event:mouse_move(*(c_point*)data);
+		break;
+	case T_mouse_move_in_event:mouse_move_in(*(c_point*)data);
+		break;
+	case T_mouse_move_out_event:mouse_move_out(*(c_point*)data);
+		break;
+	case T_input_key:input_key(*(c_key*)data);
+		break;
+	case T_focus:focus();
+		break;
+	case T_drag_event:drag(*(c_point*)data);
+		break;
+	case T_scroll_event:
+		break;
+	default:
+		break;
+	}
+	call_func_(id,data);
 }

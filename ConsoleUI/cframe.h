@@ -12,8 +12,11 @@ class cframe:public cwbase
 public:
 	cframe();
 	~cframe();
-	bool init() { return true; };
 
+	bool init() {
+		tips.create({ 0,0 }, 100, 20, this);
+		return cwbase::init();
+	}
 	static cframe& instance() {
 		static cframe frame;
 		return frame;
@@ -32,19 +35,6 @@ public:
 	}
 
 	void run() {
-		//for (auto &cwindow : window_list) {
-		//	if (cwindow) {
-		//		cwindow->init();
-		//		cwindow->update_window(true);
-		//	}
-		//}
-
-		for (auto &window : _childrend) {
-			if (window) {
-				window->init();
-				((cwindow*)window)->update_window(true);
-			}
-		}
 
 		HDC hdc = GetDC(GetConsoleWindow());
 		HBITMAP bmp = CreateCompatibleBitmap(hdc, get_console_width(), get_console_height());
@@ -53,14 +43,6 @@ public:
 		c_point old;
 		if (_childrend.size() > 0)
 			active_ctr = *(--_childrend.end());
-		//if (window_list.size() > 0) {
-		//	active_window = *(--window_list.end());
-		//}
-		//for (auto &cwindow : window_list) {
-		//	if (cwindow) {
-		//		cwindow->update_window();
-		//	}
-		//}
 		
 		while (1) {
 
@@ -68,12 +50,6 @@ public:
 			HBRUSH br = CreateSolidBrush(RGB(0, 0, 0));
 			FillRect(buffer_hdc, &rect,br);
 			DeleteObject(br);
-			//for (auto &cwindow : window_list) {
-			//	if (cwindow) {
-			//		cwindow->update();
-			//	}
-			//}
-			//active_window->update();
 
 			INPUT_RECORD keyRec;
 			DWORD state = 0, res;
@@ -84,82 +60,44 @@ public:
 			num = *f;
 			if (num > 0) {
 				ReadConsoleInput(hIn, &keyRec, 1, &res);
-
+				erase_bk();
+				//update();
 				if (keyRec.EventType == MOUSE_EVENT) {
 					POINT p;
 					GetCursorPos(&p);
 					ScreenToClient(GetConsoleWindow(), &p);
+					c_point data = { p.x ,p.y };
 					if (keyRec.Event.MouseEvent.dwEventFlags == MOUSE_MOVED) {
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-							if (active_ctr) {
-								active_ctr->drag({ p.x ,p.y });
-								continue;
-							}
+							do_somthing(active_ctr, T_drag_event, &data);
+							continue;
 						}
-						if (active_ctr) {
-							active_ctr->mouse_move({ p.x ,p.y });
+						active_ctr = get_point_ctr(this, data);
+						do_somthing(active_ctr, T_mouse_move_event, &data);
+						if (old_move_ctr != active_ctr) {
+							do_somthing(active_ctr, T_mouse_move_in_event, &data);
+							do_somthing(old_move_ctr, T_mouse_move_out_event, &data);
+							tips.show_tip(active_ctr, data);
 						}
+						old_move_ctr = active_ctr;
 					}
 					if (keyRec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK) {
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-							if (active_ctr)
-								active_ctr->double_click({ p.x ,p.y });
+							do_somthing(active_ctr, T_double_click_event, &data);
 						}
 					}
 					if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
 						if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
-							old = { p.x ,p.y };
-							auto old_ctr = active_ctr;
-							auto active_ctr = get_point_ctr(this, old);
-							if (old_ctr)
-								old_ctr->click_out(old);
-							if (active_ctr)
-								active_ctr->click_in(old);
-							
-							if (active_ctr->get_ctr_type() == T_window) {
-								if (!((cwindow*)active_ctr)->hint_t()) {
-									auto it = _childrend.end();
-									while (_childrend.begin() != it) {
-										if (active_ctr == *(--it)) {
-											_childrend.erase(it);
-											_childrend.push_back(active_ctr);
-											break;
-										}
-									}
+							do_somthing(active_ctr, T_click_in_event, &data);
+							if (old_click_ctr != active_ctr)
+								do_somthing(old_click_ctr, T_click_out_event, &data);
+							active_window = get_ctr_root_window(active_ctr);
+							if (active_window) {
+								if (!active_window->hint_t()) {
+									switch_window((cwbase*)active_window);
 								}
 							}
-							//auto it = window_list.end();
-							//auto active_it = window_list.end();
-							//while (window_list.begin() != it) {
-							//	auto window = *(--it);
-							//	if (window) {
-							//		if (window->hint_t())
-							//			break;
-							//		if (window->is_point_in({ p.x ,p.y }) && active_it == window_list.end()) {
-							//			//window->click_in(old);
-							//			cwbase *df = get_point_ctr(window, { p.x,p.y });
-							//			if (df)
-							//				OutputDebugString(to_string(df->get_ctr_type()).c_str());
-
-							//			if (window->is_close()) {
-							//				window_list.erase(it);
-							//				if (window_list.size() > 0) {
-							//					active_window = *(--window_list.end());
-							//					active_it = window_list.end();
-							//				}
-							//				break;
-							//			}
-							//			active_window = window;
-							//			active_it = it;
-							//		}
-							//		else
-							//			window->click_out(old);
-							//	}
-							//}
-							//if (active_it != window_list.end()) {
-							//	window_list.erase(active_it);
-							//	window_list.push_back(active_window);
-							//}
+							old_click_ctr = active_ctr;
 						}
 					}
 				}
@@ -174,23 +112,16 @@ public:
 					if (keyRec.Event.KeyEvent.bKeyDown)
 					{
 						if(active_ctr)
-							active_ctr->input_key(keyRec.Event.KeyEvent);
+							active_ctr->do_event(T_input_key, &keyRec.Event.KeyEvent);
 					}
 				}
-
-				//active_window->update_window();
 			}
 			else
 				Sleep(1);
 
 			ctimer::instance().check_timer();
-
-			for (auto &window : _childrend) {
-				if(window&&window->get_gdi().get_change()) {
-					BitBlt(buffer_hdc, window->get_gdi().refer_c_point_.x, window->get_gdi().refer_c_point_.y, window->get_gdi().width_, window->get_gdi().height_, window->get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
-				}
-			}
-			BitBlt(hdc, 0, 0, get_console_width(), get_console_height(), buffer_hdc, 0, 0, SRCCOPY);
+			update();
+			BitBlt(hdc, 0, 0, get_console_width(), get_console_height(), get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
 		}
 	}
 
@@ -241,9 +172,43 @@ public:
 				return nullptr;
 		}
 	}
+
+	cwindow *get_ctr_root_window(cwbase *ctr) {
+		if (!ctr)
+			return nullptr;
+		while (ctr->get_ctr_type() != T_window) {
+			ctr = ctr->get_parent();
+			if (ctr == nullptr)
+				return nullptr;
+		}
+		return (cwindow*)ctr;
+	}
+
+	bool do_somthing(cwbase* ctr, T_ctr_event id, void *data) {
+		if (!ctr)
+			return false;
+		ctr->do_event(id, data);
+	}
+
+	void switch_window(cwbase* ctr) {
+		auto it = _childrend.end();
+		while (_childrend.begin() != it) {
+			auto child = *(--it);
+			if (ctr == child) {
+				_childrend.erase(it);
+				_childrend.pop_back();
+				_childrend.push_back(ctr);
+				_childrend.push_back(&tips);
+				break;
+			}
+		}
+	}
 private:
 	list<cwindow*> window_list;
 	cwindow *active_window;
+	cwbase *old_click_ctr;
+	cwbase *old_move_ctr;
 	cwbase *active_ctr;
+	ctips tips;
 };
 

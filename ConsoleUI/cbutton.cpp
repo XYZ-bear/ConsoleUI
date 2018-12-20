@@ -25,10 +25,6 @@ bool cbutton::update()
 void cbutton::click_in(c_point p) {
 }
 
-bool cbutton::init() {
-	return true;
-}
-
 void cbutton::double_click(c_point p) {
 
 }

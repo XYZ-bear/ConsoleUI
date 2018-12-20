@@ -48,7 +48,7 @@ bool cscroll::init() {
 	else if (style_ == T_v_scroll)
 		scroll_bar_ = { { scroll_bar_offset,scroll_bar_offset },70,_height - 2 * scroll_bar_offset };
 	bar_active_color_ = bar_color_;
-	return true;
+	return cwbase::init();
 }
 
 void cscroll::double_click(c_point p) {

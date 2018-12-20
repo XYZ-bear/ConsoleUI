@@ -46,8 +46,7 @@ bool cedit::update()
 		//	ypos += _font_height;
 		//}
 	}
-	if (scroll_)
-		scroll_->update();
+
 	return cwbase::update();
 }
 
@@ -55,7 +54,6 @@ void cedit::click_in(c_point p) {
 	//ctimer::instance().add_timer(this, 500, &cedit::test);
 	test();
 	set_timer(this,500, &cedit::test);
-	scroll_->click_in(p);
 }
 
 void cedit::click_out(c_point p) {
@@ -76,7 +74,7 @@ bool cedit::init() {
 	scroll_->set_bar_color(RGB(104, 104, 104));
 	scroll_->set_bar_drag_color(RGB(200, 200, 200));
 	scroll_->add_cmd(this, T_scroll_event, &cedit::on_scroll);
-	return true;
+	return cwbase::init();
 }
 
 void cedit::double_click(c_point p) {

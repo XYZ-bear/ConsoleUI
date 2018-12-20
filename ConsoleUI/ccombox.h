@@ -28,7 +28,6 @@ public:
 	~ccombox();
 	void update_item(item roo);
 	bool update();
-	bool init();
 	void click_in(c_point p);
 	void double_click(c_point p);
 public:

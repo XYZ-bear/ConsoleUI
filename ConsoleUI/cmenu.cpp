@@ -34,10 +34,6 @@ void cmenu::click_in(c_point p) {
 	//}
 }
 
-bool cmenu::init() {
-	return true;
-}
-
 void cmenu::double_click(c_point p) {
 
 }

@@ -32,6 +32,6 @@ private:
 	HPEN hpen_;
 	HPEN open_;
 
-	bool is_change_;
+	bool is_change_ = true;
 };
 
