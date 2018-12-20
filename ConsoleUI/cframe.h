@@ -44,6 +44,9 @@ public:
 		if (_childrend.size() > 0)
 			active_ctr = *(--_childrend.end());
 		
+		c_point data;
+		c_point root_point;
+		c_point old_root_point;
 		while (1) {
 
 			RECT rect{ 0,0,get_console_width(),get_console_height() };
@@ -58,6 +61,7 @@ public:
 			LPDWORD f=(LPDWORD)&num;
 			GetNumberOfConsoleInputEvents(hIn, f);
 			num = *f;
+
 			if (num > 0) {
 				ReadConsoleInput(hIn, &keyRec, 1, &res);
 				erase_bk();
@@ -66,31 +70,38 @@ public:
 					POINT p;
 					GetCursorPos(&p);
 					ScreenToClient(GetConsoleWindow(), &p);
-					c_point data = { p.x ,p.y };
+					
 					if (keyRec.Event.MouseEvent.dwEventFlags == MOUSE_MOVED) {
+						data = { p.x ,p.y };
+						root_point = data;
+						active_ctr = get_point_ctr(this, data);
+						do_somthing(active_ctr, T_mouse_move_event, data);
+
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-							do_somthing(active_ctr, T_drag_event, &data);
+							OutputDebugString("a");
+							do_somthing(old_move_ctr, T_drag_event, root_point - old_root_point);
+							old_root_point = root_point;
 							continue;
 						}
-						active_ctr = get_point_ctr(this, data);
-						do_somthing(active_ctr, T_mouse_move_event, &data);
+
 						if (old_move_ctr != active_ctr) {
-							do_somthing(active_ctr, T_mouse_move_in_event, &data);
-							do_somthing(old_move_ctr, T_mouse_move_out_event, &data);
-							tips.show_tip(active_ctr, data);
+							do_somthing(active_ctr, T_mouse_move_in_event, data);
+							do_somthing(old_move_ctr, T_mouse_move_out_event, data);
+							tips.show_tip(active_ctr, root_point);
 						}
 						old_move_ctr = active_ctr;
+						old_root_point = root_point;
 					}
 					if (keyRec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK) {
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-							do_somthing(active_ctr, T_double_click_event, &data);
+							do_somthing(active_ctr, T_double_click_event, data);
 						}
 					}
 					if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
 						if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
-							do_somthing(active_ctr, T_click_in_event, &data);
+							do_somthing(active_ctr, T_click_in_event, data);
 							if (old_click_ctr != active_ctr)
-								do_somthing(old_click_ctr, T_click_out_event, &data);
+								do_somthing(old_click_ctr, T_click_out_event, data);
 							active_window = get_ctr_root_window(active_ctr);
 							if (active_window) {
 								if (!active_window->hint_t()) {
@@ -146,9 +157,10 @@ public:
 		}
 	}
 
-	cwbase* get_point_ctr(cwbase *parent,c_point p) {
+	cwbase* get_point_ctr(cwbase *parent,c_point &p) {
 		if (parent) {
 			if (parent->is_point_in(p)) {
+				p=parent->get_client_point(p);
 				auto &children = parent->get_children();
 				if (children.size() == 0) {
 					return parent;
@@ -158,7 +170,7 @@ public:
 					
 					while (children.begin() != it) {
 						auto child = *(--it);
-						auto res=get_point_ctr(child, parent->get_client_point(p));
+						auto res=get_point_ctr(child, p);
 						if (res) {
 							return res;
 						}
@@ -184,10 +196,10 @@ public:
 		return (cwindow*)ctr;
 	}
 
-	bool do_somthing(cwbase* ctr, T_ctr_event id, void *data) {
+	bool do_somthing(cwbase* ctr, T_ctr_event id, c_point data ) {
 		if (!ctr)
 			return false;
-		ctr->do_event(id, data);
+		ctr->do_event(id, &data);
 	}
 
 	void switch_window(cwbase* ctr) {

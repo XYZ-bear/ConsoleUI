@@ -73,6 +73,11 @@ public:
 		return p - _left_top;
 	}
 
+	c_point get_parent_point(c_point p) {
+		if (_parent)
+			return _parent->get_left_top() + p;
+	}
+
 	void erase_bk();
 
 	template<class T,class _Fn>
@@ -97,7 +102,7 @@ public:
 
 	void update_parent();
 
-	void do_event(T_ctr_event id,void *data);
+	void do_event(T_ctr_event id,const void *data);
 
 	void set_tip(string str) { _tip_str = str; }
 
@@ -115,6 +120,6 @@ public:
 	virtual void input_key(c_key key) { };
 	virtual void focus() { };
 	virtual void drag(c_point p) { };
-	virtual bool pre_event(T_ctr_event id, void *data) { return true; };
+	virtual bool pre_event(T_ctr_event id, const void *data) { return true; };
 };
 

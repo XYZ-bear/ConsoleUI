@@ -165,6 +165,6 @@ void cedit::input_key(c_key key) {
 	update();
 }
 
-void cedit::on_scroll(void *data) {
+void cedit::on_scroll(const void *data) {
 	_bk_color = RGB(255, 0, 0);
 }

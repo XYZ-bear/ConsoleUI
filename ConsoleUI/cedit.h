@@ -26,7 +26,7 @@ public:
 	void set_spin_color(COLORREF color) { spin_color_ = color; };
 	T_edit_style get_style() { return style_; };
 
-	void on_scroll(void *data);
+	void on_scroll(const void *data);
 private:
 	bool is_spin;
 	int spin_x_;

@@ -93,7 +93,7 @@ public:
 	void size_change(c_rect rect);
 	void input_key(c_key key);
 public:
-	void close_click( void* p);
-	void max_click( void* p);
+	void close_click( const void* p);
+	void max_click( const void* p);
 };
 

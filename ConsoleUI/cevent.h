@@ -5,12 +5,12 @@
 
 class base_event_brigde {
 public:
-	virtual void do_event(int id, void *data) {};
+	virtual void do_event(int id, const void *data) {};
 };
 
 template<typename T>
 class event_brigde :public base_event_brigde {
-	typedef void (T::*callback)(void* data);
+	typedef void (T::*callback)(const void* data);
 private:
 	T * ob_;
 	map<int, callback> event_func_;
@@ -19,7 +19,7 @@ public:
 		ob_ = ob;
 		event_func_[id] = func;
 	}
-	void do_event(int id, void *data) {
+	void do_event(int id, const void *data) {
 		if (event_func_[id])
 			(ob_->*event_func_[id])(data);
 	}
@@ -37,12 +37,12 @@ public:
 			brigde_ = new event_brigde<T>();
 		}
 		((event_brigde<T>*)brigde_)->add_event(con, id, func);
-		call_func_ = [this](int id, void *data) {
+		call_func_ = [this](int id, const void *data) {
 			brigde_->do_event(id, data);
 		};
 	}
 private:
 	base_event_brigde * brigde_ = nullptr;
 protected:
-	function<void(int id, void* data)> call_func_ = [this](int id, void *data) {};
+	function<void(int id, const void* data)> call_func_ = [this](int id, const void *data) {};
 };

@@ -154,7 +154,7 @@ void cwbase::remove_child(cwbase *ctr) {
 	}
 }
 
-void cwbase::do_event(T_ctr_event id, void *data) {
+void cwbase::do_event(T_ctr_event id, const void *data) {
 	if (!pre_event(id, data))
 		return;
 	switch (id)

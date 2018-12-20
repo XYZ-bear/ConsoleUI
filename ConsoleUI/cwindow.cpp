@@ -135,7 +135,7 @@ bool cwindow::create(string title, c_point op, int width, int height) {
 }
 
 void cwindow::click_in(c_point p) {
-	if (p.x<_right_bottom.x&&p.x>_left_top.x&&p.y > _left_top.y&&p.y < _left_top.y + header_height)
+	if (p.y < header_height)
 		is_mouse_in_header = true;
 	else
 		is_mouse_in_header = false;
@@ -172,45 +172,33 @@ void cwindow::click_out(c_point p) {
 }
 
 void cwindow::mouse_move(c_point p) {
-	if (p.x > _right_bottom.x - 5 && p.x < _right_bottom.x + 5 && p.y > _right_bottom.y - 5 && p.y < _right_bottom.y + 5)
+	//if (p.x > _right_bottom.x - 5 && p.x < _right_bottom.x + 5 && p.y > _right_bottom.y - 5 && p.y < _right_bottom.y + 5)
+	//	hint_t_ = T_hint_right_bottom;
+	//else if (p.x > _right_bottom.x - 5&& p.x < _right_bottom.x + 5) 
+	//	hint_t_ = T_hint_right;
+	//else if (p.y > _right_bottom.y - 5 && p.y < _right_bottom.y + 5) 
+	//	hint_t_ = T_hint_bottom;
+	//else 
+	//	hint_t_ = T_hint_nono;
+	if (p.x > _width - 5 && p.x < _right_bottom.x + 5 && p.y > _height - 5 && p.y < _height + 5)
 		hint_t_ = T_hint_right_bottom;
-	else if (p.x > _right_bottom.x - 5&& p.x < _right_bottom.x + 5) 
+	else if (p.x > _width - 5 && p.x < _width + 5)
 		hint_t_ = T_hint_right;
-	else if (p.y > _right_bottom.y - 5 && p.y < _right_bottom.y + 5) 
+	else if (p.y > _height - 5 && p.y < _height + 5)
 		hint_t_ = T_hint_bottom;
-	else 
+	else
 		hint_t_ = T_hint_nono;
 	hint(p);
-
-	auto client_p = get_client_point(p);
-	//if (auto t = point_in_ctr(p)) {
-	//	if (!point_ctr) {
-	//		t->mouse_move_in(client_p);
-	//		point_ctr = t;
-	//	}
-	//}
-	//else {
-	//	if (point_ctr) {
-	//		point_ctr->mouse_move_out(client_p);
-	//		point_ctr = nullptr;
-	//	}
-	//}
-
-	if (point_ctr) {
-		tips.show_tip(point_ctr, client_p);
-	}
-	else
-		tips.set_is_show(false);
 }
 
-void cwindow::close_click(void* p) {
+void cwindow::close_click(const void* p) {
 	c_point *res = (c_point*)p;
 	//MessageBox(GetConsoleWindow(), "close", "", 1);
 	is_close_ = true;
 	remove_self();
 }
 
-void cwindow::max_click(void* p) {
+void cwindow::max_click(const void* p) {
 	c_point *res = (c_point*)p;
 	double_click(*res);
 }
@@ -235,16 +223,15 @@ void cwindow::double_click(c_point p) {
 }
 
 void cwindow::hint(c_point p) {
-	hint_point = get_client_point(p);
+	hint_point = p;
 	update_window();
 }
 
 void cwindow::drag(c_point p) {
-	if (p > c_point{ 0,0 }&&p < c_point{ get_console_width(),get_console_height() }) {
+	//if (p > c_point{ 0,0 }&&p < c_point{ get_console_width(),get_console_height() }) {
 		if (is_mouse_in_header) {
-			auto move = p - pre_point;
-			set_point(move + _left_top);
-			old_rect.p = move + _left_top;
+			set_point(p + _left_top);
+			old_rect.p = p + _left_top;
 			is_drag_ = true;
 			if (is_max_) {
 				set_size(p - c_point{(p.x*old_rect.width )/ get_console_width(),(p.y*old_rect.height) / get_console_height()}, old_rect.width, old_rect.height);
@@ -255,28 +242,24 @@ void cwindow::drag(c_point p) {
 				//}
 			}
 		}
-	}
+	//}
 	if (hint_t_ != T_hint_nono) {
 		old_rect.width = _width;
 		old_rect.height = _height;
-		auto move = p - pre_point;
 		if (hint_t_ == T_hint_right) {
-			set_size(_left_top, _width + move.x, _height);
+			set_size(_left_top, _width + p.x, _height);
 		}
 		else if (hint_t_ == T_hint_bottom) {
-			set_size(_left_top, _width, _height + move.y);
+			set_size(_left_top, _width, _height + p.y);
 		}
 		else if (hint_t_ == T_hint_right_bottom) {
-			set_size(_left_top, _width + move.x, _height + move.y);
+			set_size(_left_top, _width + p.x, _height + p.y);
 		}
 		size_change(old_rect);
 		update_window();
 	}
 
-	if (point_ctr)
-		point_ctr->drag(p);
-
-	pre_point = p;
+	//pre_point = p;
 }
 
 void cwindow::size_change(c_rect rect) {
