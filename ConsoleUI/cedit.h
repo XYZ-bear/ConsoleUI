@@ -31,6 +31,8 @@ private:
 	bool is_spin;
 	int spin_x_;
 	int spin_y_;
+	int spin_x_off_;
+	int spin_y_off_;
 	COLORREF spin_color_ = RGB(255, 255, 255);
 	string text_;
 	T_edit_style style_= T_singleline_edit;

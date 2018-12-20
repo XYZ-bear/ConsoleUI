@@ -9,6 +9,8 @@ cedit::cedit()
 	is_spin = false;
 	spin_x_ = 2;
 	spin_y_ = 2;
+	spin_x_off_ = 0;
+	spin_y_off_ = 0;
 }
 
 
@@ -23,28 +25,33 @@ bool cedit::update()
 	if (style_ == T_singleline_edit)
 		_gdi.draw_text(text_, { 2,2 }, _font_height);
 	else {
-		_gdi.draw_text(text_, { 2,2 }, _font_height);
+		//_gdi.draw_text(text_, { 2,2 }, _font_height);
 
-		//size_t pre_pos = 0;
-		//size_t old_pos = 0;
-		//while (1) {
-		//	
-		//	//pos = text_.find_first_of('\r', pos);
-		//	//_gdi.draw_text(text_.substr(0, pos - 1), { 2,ypos }, _font_height);
-		//	//if(pos==-1)
-		//}
-		//size_t pos = 0; 
-		//text_.substr(0, pos);
-		//int ypos = 2;
-		//do {
-		//	pos = text_.find_first_of('\r', pos);
-		//	_gdi.draw_text(text_.substr(0, pos-1), { 2,ypos }, _font_height);
-		//	ypos += _font_height;
-		//} while (pos != -1);
-		//while (pos = text_.find_first_of('\r', pos) != -1) {
-		//	_gdi.draw_text(text_.substr(0, pos), { 2,ypos }, _font_height);
-		//	ypos += _font_height;
-		//}
+		size_t pre_pos = 0;
+		size_t old_pos = -1;
+		int ypos = 2;
+		spin_y_ = 0;
+		spin_x_ = 0;
+		while (1) {
+			pre_pos = text_.find_first_of('\r', old_pos + 1);
+
+			if (pre_pos == -1) {
+				_gdi.draw_text(text_.substr(old_pos + 1, text_.size() - old_pos - 1), { 2,ypos }, _font_height);
+				spin_x_ = (text_.size() - old_pos - 1)*_font_height / 2 + 2;
+				break;
+			}
+			else {
+				_gdi.draw_text(text_.substr(old_pos + 1, pre_pos - old_pos - 1), { 2,ypos }, _font_height);
+				old_pos = pre_pos;
+				ypos += _font_height;
+				spin_y_ += _font_height;
+				//int len = (pre_pos - old_pos - 1);
+				//if(len<=0)
+				spin_x_ = (pre_pos - old_pos - 1)*_font_height / 2;
+			}
+		}
+		spin_x_ += spin_x_off_;
+		spin_y_ += spin_y_off_;
 	}
 
 	return cwbase::update();
@@ -114,36 +121,44 @@ void cedit::input_key(c_key key) {
 			}
 			text_.pop_back();
 			spin_x_ -= _font_height / 2;
-			goto update;
 		} 
+		goto update;
 	}
 	else if (key.wVirtualKeyCode == VK_RIGHT) {
 		if (text_.size() > 0) {
-			int t = spin_x_ + _font_height / 2;
-			if (t > _width) {
-				spin_x_ = 2;
-				spin_y_ += _font_height;
+			spin_x_off_ += _font_height / 2;
+			if (spin_x_off_ + spin_x_ > _width) {
+				spin_x_off_ = 0;
+				spin_y_off_ += _font_height;
+			}
+	/*		if (t > _width) {
+				spin_x_off_ = 0;
+				spin_y_off_ += _font_height;
 			}
 			else
-				spin_x_ = t;
+				spin_x_off_ = t;*/
 			goto update;
 		}
 	}
 	else if (key.wVirtualKeyCode == VK_LEFT) {
 		if (text_.size() > 0) {
-			int t = spin_x_ - _font_height / 2;
-			if (t < 0) {
-				spin_x_ = _width - 2;
-				spin_y_ -= _font_height;
+			spin_x_off_ -= _font_height / 2;
+			if (spin_x_off_ + spin_x_ <0) {
+				spin_x_off_ = _width-2;
+				spin_y_off_ -= _font_height;
 			}
-			else
-				spin_x_ = t;
+			//if (t < 0) {
+			//	spin_x_off_ = _width - 2;
+			//	spin_y_off_ -= _font_height;
+			//}
+			//else
+			//	spin_x_off_ = t;
 			goto update;
 		}
 	}
 	if (key.uChar.AsciiChar!=0) {
 		text_ += key.uChar.AsciiChar;
-		spin_x_ += _font_height / 2;
+		//spin_x_ += _font_height / 2;
 	}
 
 	update:
