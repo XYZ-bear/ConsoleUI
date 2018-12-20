@@ -139,6 +139,21 @@ void cwbase::move_child_to_end(cwbase* ctr) {
 	}
 }
 
+void cwbase::remove_self() {
+	if (_parent)
+		_parent->remove_child(this);
+}
+
+void cwbase::remove_child(cwbase *ctr) {
+	auto it = _childrend.end();
+	while (_childrend.begin() != it) {
+		if (ctr == *(--it)) {
+			_childrend.erase(it);
+			break;
+		}
+	}
+}
+
 void cwbase::do_event(T_ctr_event id, void *data) {
 	if (!pre_event(id, data))
 		return;

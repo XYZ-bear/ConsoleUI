@@ -91,6 +91,10 @@ public:
 
 	void move_child_to_end(cwbase* ctr);
 
+	void remove_self();
+
+	void remove_child(cwbase *ctr);
+
 	void update_parent();
 
 	void do_event(T_ctr_event id,void *data);

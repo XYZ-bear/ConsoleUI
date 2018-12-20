@@ -207,6 +207,7 @@ void cwindow::close_click(void* p) {
 	c_point *res = (c_point*)p;
 	//MessageBox(GetConsoleWindow(), "close", "", 1);
 	is_close_ = true;
+	remove_self();
 }
 
 void cwindow::max_click(void* p) {
