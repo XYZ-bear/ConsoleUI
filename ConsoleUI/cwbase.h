@@ -32,6 +32,7 @@ protected:
 	cwbase *_parent = nullptr;
 	list<cwbase*> _childrend;
 	string _tip_str;
+
 public:
 	cwbase();
 	virtual ~cwbase();
@@ -109,7 +110,7 @@ public:
 	string get_tip() { return _tip_str; }
 public:
 	virtual bool init();
-	virtual bool update();
+	virtual bool update(bool redraw = false);
 	virtual bool create( c_point op, int width, int height, cwbase *parent=nullptr, COLORREF _bk_color = RGB(255, 255, 255));
 	virtual void click_in(c_point p) { };
 	virtual void click_out(c_point p) { };

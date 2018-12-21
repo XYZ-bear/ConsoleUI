@@ -41,24 +41,24 @@ bool cwindow::init() {
 	close_button2->create({ _width - 45,5 }, 15, 15, this, RGB(0, 128, 0));
 	close_button2->set_type(T_circle_button);
 	close_button2->add_cmd(this, T_click_in_event, &cwindow::max_click);
-	////regist_control_call(D_mouse_click_event, close_button2, &cwindow::max_click);
+	//////regist_control_call(D_mouse_click_event, close_button2, &cwindow::max_click);
 
 	cbutton *close_button3 = new cbutton();
 	close_button3->create({ _width - 65,5 }, 15, 15, this, RGB(255, 215, 0));
 	close_button3->set_type(T_circle_button);
 
 
-	//cmenu *comb = new cmenu(this);
-	//comb->get_root().text = "com1";
-	//comb->get_root()[0].text = "root1";
-	//comb->get_root()[1].text = "root2";
-	//comb->get_root()[2].text = "root3";
-	//comb->get_root()[3].text = "root4";
-	//comb->create({ 65,65 }, 70,90, this,RGB(255, 0, 0));
-	//add_child(comb);
+	////cmenu *comb = new cmenu(this);
+	////comb->get_root().text = "com1";
+	////comb->get_root()[0].text = "root1";
+	////comb->get_root()[1].text = "root2";
+	////comb->get_root()[2].text = "root3";
+	////comb->get_root()[3].text = "root4";
+	////comb->create({ 65,65 }, 70,90, this,RGB(255, 0, 0));
+	////add_child(comb);
 
 	cedit *edit = new cedit();
-	edit->create({ 200,100 }, 100, 200, this, RGB(255, 215, 0));
+	edit->create({ 60,50 }, 100, 200, this, RGB(255, 215, 0));
 	edit->set_style(T_multiline_edit);
 
 	cscroll *scroll = new cscroll();
@@ -71,14 +71,13 @@ bool cwindow::init() {
 	//cscroll *scrollv = new cscroll();
 	//scrollv->create({ 100,300 }, 200, 12, this);
 	//scrollv->set_style(T_v_scroll);
-	//add_child(scrollv);
 
 	//tips.create({ 0,0 }, 100, 20, this);
 
 	return cwbase::init();
 }
 
-bool cwindow::update() {
+bool cwindow::update(bool redraw) {
 	erase_bk();
 	_gdi.draw_ellipse({ 50,50 },20, RGB(255, 0, 0));
 	_gdi.draw_frame_rect({ 0,0 }, { _width ,_height }, 10, RGB(255, 0, 0));
@@ -101,30 +100,8 @@ bool cwindow::update() {
 		_gdi.draw_line({ _width - 4,_height - 4 }, { _width - 4 ,_height - 15 }, 1, RGB(255, 0, 0));
 	}
 
-	return cwbase::update();
+	return cwbase::update(redraw);
 }
-
-void cwindow::update_window(bool redraw) {
-	update();
-	for (auto &child : _childrend) {
-		if (child->is_show()) {
-			if (redraw)
-				child->update();
-			else if (child->get_gdi().get_change())
-				BitBlt(get_gdi().buffer_hdc_, child->get_gdi().refer_c_point_.x, child->get_gdi().refer_c_point_.y, child->get_gdi().width_, child->get_gdi().height_, child->get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
-		}
-	}
-}
-
-//bool cwindow::add_child(cwbase *child) {
-//	if (child) {
-//		child->set_align(prejudge_align_v(child->get_point()));
-//		chidren_list.push_back(child);
-//		child->init();
-//		return true;
-//	}
-//	return false;
-//}
 
 bool cwindow::create(string title, c_point op, int width, int height) {
 	title_ = title;
@@ -141,45 +118,13 @@ void cwindow::click_in(c_point p) {
 		is_mouse_in_header = false;
 	
 	pre_point = p;
-	//auto it = chidren_list.end();
-	//bool is_top_click_ctr = false;
-	//while (chidren_list.begin() != it) {
-	//	auto child = *(--it);
-	//	if (child&&child->is_point_in(p-get_left_top())&&
-	//		is_top_click_ctr==false && child->enable_focus()) {
-	//		child->click_in(p);
-	//		call_func_(D_mouse_click_event, child,&p);
-	//		child->set_is_focus(true);
-	//		focus_ctr = child;
-	//		is_top_click_ctr = true;
-	//		//break;
-	//	}
-	//	else {
-	//		child->click_out(p);
-	//		child->set_is_focus(false);
-	//	}
-	//}
 }
 
 void cwindow::click_out(c_point p) {
 	is_mouse_in_header = false;
-	//auto it = chidren_list.end();
-	//while (chidren_list.begin() != it) {
-	//	auto child = *(--it);
-	//	child->click_out(p);
-	//	child->set_is_focus(false);
-	//}
 }
 
 void cwindow::mouse_move(c_point p) {
-	//if (p.x > _right_bottom.x - 5 && p.x < _right_bottom.x + 5 && p.y > _right_bottom.y - 5 && p.y < _right_bottom.y + 5)
-	//	hint_t_ = T_hint_right_bottom;
-	//else if (p.x > _right_bottom.x - 5&& p.x < _right_bottom.x + 5) 
-	//	hint_t_ = T_hint_right;
-	//else if (p.y > _right_bottom.y - 5 && p.y < _right_bottom.y + 5) 
-	//	hint_t_ = T_hint_bottom;
-	//else 
-	//	hint_t_ = T_hint_nono;
 	if (p.x > _width - 5 && p.x < _right_bottom.x + 5 && p.y > _height - 5 && p.y < _height + 5)
 		hint_t_ = T_hint_right_bottom;
 	else if (p.x > _width - 5 && p.x < _width + 5)
@@ -224,7 +169,6 @@ void cwindow::double_click(c_point p) {
 
 void cwindow::hint(c_point p) {
 	hint_point = p;
-	update_window();
 }
 
 void cwindow::drag(c_point p) {
@@ -256,7 +200,6 @@ void cwindow::drag(c_point p) {
 			set_size(_left_top, _width + p.x, _height + p.y);
 		}
 		size_change(old_rect);
-		update_window();
 	}
 
 	//pre_point = p;
@@ -289,15 +232,4 @@ T_align cwindow::prejudge_align_h(c_point p) {
 	if (p.y <= _height && p.y > _height / 2)
 		return T_h_align_right;
 	return T_h_align_left;
-}
-
-cwbase* cwindow::point_in_ctr(c_point p) {
-	//auto it = chidren_list.end();
-	//while (chidren_list.begin() != it) {
-	//	auto child = *(--it);
-	//	if (child&&child->is_point_in(get_client_point(p))) {
-	//		return child;
-	//	}
-	//}
-	return nullptr;
 }

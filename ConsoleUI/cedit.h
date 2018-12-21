@@ -15,7 +15,7 @@ public:
 	cedit();
 	~cedit();
 
-	bool update();
+	bool update(bool redraw=false);
 	bool init();
 	void click_in(c_point p);
 	void click_out(c_point p);
@@ -40,5 +40,6 @@ private:
 public:
 	void mouse_move_in(c_point p);
 	void mouse_move_out(c_point p);
+	void focus();
 };
 

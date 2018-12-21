@@ -13,7 +13,7 @@ cmenu::~cmenu()
 {
 }
 
-bool cmenu::update()
+bool cmenu::update(bool redraw)
 {
 	_gdi.fill_rect({ 0,0 }, { _width,_height }, _bk_color);
 
@@ -23,7 +23,7 @@ bool cmenu::update()
 	if (active_item) {
 		update_item(active_item, item_height_);
 	}
-	return true;
+	return cwbase::update(redraw);
 }
 
 void cmenu::click_in(c_point p) {

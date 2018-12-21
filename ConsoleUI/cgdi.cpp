@@ -13,7 +13,7 @@ void cgdi::init() {
 	buffer_hdc_ = CreateCompatibleDC(NULL);
 	hdc_ = GetDC(GetConsoleWindow());
 	bmp_ = CreateCompatibleBitmap(hdc_, width_, height_); 
-	SelectObject(buffer_hdc_, bmp_);
+	old_bitmap_ = (HBITMAP)SelectObject(buffer_hdc_, bmp_);
 }
 
 void cgdi::draw_line(c_point p1, c_point p2, int width, COLORREF color, int style) {
@@ -120,4 +120,10 @@ void cgdi::set_change(bool is) {
 
 bool cgdi::get_change() {
 	return is_change_;
+}
+
+void cgdi::release() {
+	//DeleteObject(bmp_);
+	//DeleteObject(hdc_);
+	SelectObject(buffer_hdc_, old_bitmap_);
 }

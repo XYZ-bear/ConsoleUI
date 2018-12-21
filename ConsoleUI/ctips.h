@@ -8,7 +8,7 @@ public:
 	ctips();
 	~ctips();
 
-	bool update();
+	bool update(bool redraw = false);
 	bool init();
 	void click_in(c_point p);
 	void click_out(c_point p);

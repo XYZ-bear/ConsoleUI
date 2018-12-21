@@ -14,6 +14,23 @@ public:
 	~cframe();
 
 	bool init() {
+		cwindow *window=new cwindow();
+		window->create("windows1", { 10,20 }, 600, 400);
+
+		cwindow *window2 = new cwindow();
+		window2->create("windows2", { 100,60 }, 300, 200);
+
+		//cwindow window3;
+		//window3.create("windows3", { 400,60 }, 300, 200);
+
+		//cframe::instance().add(&window2);
+		//cframe::instance().add(&window3);
+
+		//int k = 40;
+		//for (int i = 0; i < 300; i++) {
+		//	cwindow *window4 = new cwindow();
+		//	window4->create(to_string(i), { k + i,60 }, 100, 100);
+		//}
 		tips.create({ 0,0 }, 100, 20, this);
 		return cwbase::init();
 	}
@@ -47,8 +64,8 @@ public:
 		c_point data;
 		c_point root_point;
 		c_point old_root_point;
-		while (1) {
 
+		while (1) {
 			RECT rect{ 0,0,get_console_width(),get_console_height() };
 			HBRUSH br = CreateSolidBrush(RGB(0, 0, 0));
 			FillRect(buffer_hdc, &rect,br);
@@ -65,7 +82,7 @@ public:
 			if (num > 0) {
 				ReadConsoleInput(hIn, &keyRec, 1, &res);
 				erase_bk();
-				//update();
+	
 				if (keyRec.EventType == MOUSE_EVENT) {
 					POINT p;
 					GetCursorPos(&p);
@@ -78,7 +95,6 @@ public:
 						do_somthing(active_ctr, T_mouse_move_event, data);
 
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-							OutputDebugString("a");
 							do_somthing(old_move_ctr, T_drag_event, root_point - old_root_point);
 							old_root_point = root_point;
 							continue;
@@ -100,6 +116,8 @@ public:
 					if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
 						if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
 							do_somthing(active_ctr, T_click_in_event, data);
+							do_focus(active_ctr, T_focus, true);
+							tips.set_is_show(false);
 							if (old_click_ctr != active_ctr)
 								do_somthing(old_click_ctr, T_click_out_event, data);
 							active_window = get_ctr_root_window(active_ctr);
@@ -131,7 +149,7 @@ public:
 				Sleep(1);
 
 			ctimer::instance().check_timer();
-			update();
+			redraw_windows();
 			BitBlt(hdc, 0, 0, get_console_width(), get_console_height(), get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
 		}
 	}
@@ -202,6 +220,13 @@ public:
 		ctr->do_event(id, &data);
 	}
 
+	bool do_focus(cwbase* ctr, T_ctr_event id, bool data) {
+		if (!ctr)
+			return false;
+		ctr->set_is_focus(data);
+		ctr->do_event(id, &data);
+	}
+
 	void switch_window(cwbase* ctr) {
 		auto it = _childrend.end();
 		while (_childrend.begin() != it) {
@@ -213,6 +238,13 @@ public:
 				_childrend.push_back(&tips);
 				break;
 			}
+		}
+	}
+
+	void redraw_windows() {
+		for (auto child : _childrend) {
+			if (child->is_show())
+				child->update_parent();
 		}
 	}
 private:

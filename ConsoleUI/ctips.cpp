@@ -13,14 +13,14 @@ ctips::~ctips()
 {
 }
 
-bool ctips::update()
+bool ctips::update(bool redraw)
 {
 	//if (!_is_show)
 	//	return false;
 	//erase_bk();
 	//_gdi.draw_frame_rect({ 0,0 }, { _width ,_height });
 	//_gdi.draw_text(text_, { 2,2 }, _height - 4);
-	return cwbase::update();
+	return cwbase::update(redraw);
 }
 
 void ctips::show_tip(cwbase *bind_ob, c_point p) {
@@ -42,6 +42,8 @@ void ctips::show_tip(cwbase *bind_ob, c_point p) {
 		_gdi.draw_text(str, { 4,2 }, D_default_font_height,RGB(100,100,100));
 		cwbase::update();
 	}
+	else
+		set_is_show(false);
 }
 
 void ctips::click_in(c_point p) {

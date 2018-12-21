@@ -18,7 +18,7 @@ cedit::~cedit()
 {
 }
 
-bool cedit::update()
+bool cedit::update(bool redraw)
 {
 	erase_bk();
 	_gdi.draw_frame_rect({ 0,0 }, { _width ,_height });
@@ -54,12 +54,11 @@ bool cedit::update()
 		spin_y_ += spin_y_off_;
 	}
 
-	return cwbase::update();
+	return cwbase::update(redraw);
 }
 
 void cedit::click_in(c_point p) {
 	//ctimer::instance().add_timer(this, 500, &cedit::test);
-	test();
 	set_timer(this,500, &cedit::test);
 }
 
@@ -90,6 +89,10 @@ void cedit::double_click(c_point p) {
 
 void cedit::mouse_move_in(c_point p) {
 	_active_color = _mouse_in_color;
+}
+
+void cedit::focus() {
+	test();
 }
 
 void cedit::mouse_move_out(c_point p) {

@@ -27,7 +27,7 @@ public:
 	ccombox(cwbase *parent_window);
 	~ccombox();
 	void update_item(item roo);
-	bool update();
+	bool update(bool redraw = false);
 	void click_in(c_point p);
 	void double_click(c_point p);
 public:

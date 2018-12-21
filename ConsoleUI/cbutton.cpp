@@ -12,14 +12,14 @@ cbutton::~cbutton()
 {
 }
 
-bool cbutton::update()
+bool cbutton::update(bool redraw)
 {
 	//_gdi.fill_rect({ 0,0 }, { _width ,_height }, 1, RGB(0, 255, 0));
 	if (button_type == T_circle_button)
 		_gdi.draw_ellipse({ 0,0 }, _width, _active_color);
 	else
 		_gdi.fill_rect({ 0,0 }, { _width ,_height }, RGB(0, 255, 0));
-	return cwbase::update();
+	return cwbase::update(redraw);
 }
 
 void cbutton::click_in(c_point p) {

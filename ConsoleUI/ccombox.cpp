@@ -13,7 +13,7 @@ ccombox::~ccombox()
 {
 }
 
-bool ccombox::update()
+bool ccombox::update(bool redraw)
 {
 	_gdi.fill_rect({ 0,0 }, { comb_width_,comb_height_ }, _bk_color);
 	_gdi.draw_text(root.text, { 0,0 });
@@ -23,7 +23,7 @@ bool ccombox::update()
 			_gdi.draw_text(item.second.text, { 10,10 });
 		}
 	}
-	return cwbase::update();
+	return cwbase::update(redraw);
 }
 
 void ccombox::click_in(c_point p) {

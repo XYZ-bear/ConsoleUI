@@ -42,12 +42,25 @@ bool cwbase::init() {
 	return true;
 }
 
-bool cwbase::update() {
+bool cwbase::update(bool redraw) {
 	if (_is_show) {
 		for (auto child : _childrend) {
-			child->update();
+			if (redraw) {	
+				child->update(redraw);
+			}
+			else
+				child->update_parent();
 		}
-		update_parent();
+		if (redraw) {
+			update_parent();
+		}
+		else {
+			auto parent = this;
+			while (parent&&parent->get_ctr_type() != T_window) {
+				parent->update_parent();
+				parent = parent->_parent;
+			}
+		}
 	}
 	return true;
 }
@@ -123,6 +136,8 @@ void cwbase::erase_bk() {
 void cwbase::update_parent() {
 	if (_parent) {
 		BitBlt(_parent->get_gdi().buffer_hdc_, _gdi.refer_c_point_.x, _gdi.refer_c_point_.y, _gdi.width_, _gdi.height_, _gdi.buffer_hdc_, 0, 0, SRCCOPY);
+		//if (get_ctr_type() != T_window)
+		//	get_gdi().release();
 		//_parent->get_gdi().set_change(true);
 	}
 }

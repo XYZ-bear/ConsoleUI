@@ -37,7 +37,6 @@ class cwindow :public cwbase
 public:
 	cwindow();
 	~cwindow();
-	bool add_child(cwbase *child);
 	bool create(string title,c_point op, int width, int height);
 	string get_title() { return title_; }
 	void set_title(string title) { title_ = title; }
@@ -49,7 +48,6 @@ public:
 	T_hint hint_t() { return hint_t_; }
 	T_align prejudge_align_v(c_point p);
 	T_align prejudge_align_h(c_point p);
-	void update_window(bool redraw=false);
 private:
 	template<class T, class _Fn>
 	void add_cmd(T *con, int id, cwbase *base, _Fn func) {
@@ -61,7 +59,6 @@ private:
 			brigde_->do_event(id, base, data);
 		};
 	}
-	cwbase* point_in_ctr(c_point p);
 private:
 	list<cwbase *> chidren_list;
 	string title_;
@@ -83,7 +80,7 @@ private:
 	ctips tips;
 public:
 	bool init();
-	bool update();
+	bool update(bool redraw);
 	void click_in(c_point p);
 	void click_out(c_point p);
 	void mouse_move(c_point p);

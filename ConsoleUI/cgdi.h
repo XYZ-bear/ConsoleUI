@@ -18,6 +18,7 @@ public:
 	void set_refer_point(c_point rp);
 	void update();
 	void init();
+	void release();
 	void set_rng(int width, int height);
 	void set_change(bool is);
 	bool get_change();
@@ -29,6 +30,7 @@ private:
 	HDC hdc_;
 	
 	HBITMAP bmp_;
+	HBITMAP old_bitmap_;
 	HPEN hpen_;
 	HPEN open_;
 
