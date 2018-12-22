@@ -1,4 +1,44 @@
 #pragma once
+
+class cdc {
+public:
+	HDC hdc_;
+	HDC buffer_hdc_;
+	HBITMAP bmp_;
+	bool init() {
+		hdc_ = GetDC(GetConsoleWindow());
+		if (!(buffer_hdc_ = CreateCompatibleDC(NULL))) {
+			return false;
+		}
+		if (!(bmp_ = CreateCompatibleBitmap(hdc_, get_console_width(), get_console_height()))) {
+			return false;
+		}
+	}
+	static cdc& instance() {
+		static cdc dc;
+		return dc;
+	}
+	HDC get_buffer_hdc() {
+		return buffer_hdc_;
+	}
+	int get_console_width() {
+		RECT r;
+		GetClientRect(GetConsoleWindow(), &r);
+		return r.right;
+	}
+
+	int get_console_height() {
+		RECT r;
+		GetClientRect(GetConsoleWindow(), &r);
+		return r.bottom;
+	}
+
+	void update() {
+		BitBlt(hdc_, 0, 0, get_console_width(), get_console_height(), buffer_hdc_, 0, 0, SRCCOPY);
+	}
+};
+
+
 class cgdi
 {
 public:
@@ -17,7 +57,7 @@ public:
 	void draw_ellipse(c_point p1, int len, COLORREF color = RGB(255, 255, 255));
 	void set_refer_point(c_point rp);
 	void update();
-	void init();
+	bool init();
 	void release();
 	void set_rng(int width, int height);
 	void set_change(bool is);
@@ -30,7 +70,6 @@ private:
 	HDC hdc_;
 	
 	HBITMAP bmp_;
-	HBITMAP old_bitmap_;
 	HPEN hpen_;
 	HPEN open_;
 

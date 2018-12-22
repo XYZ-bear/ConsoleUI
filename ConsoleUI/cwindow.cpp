@@ -25,9 +25,6 @@ cwindow::~cwindow()
 bool cwindow::init() {
 	is_mouse_in_header = false;
 	header_height = 30;
-	//cbutton *button = new cbutton();;
-	//button->create({ 10,60 }, 30, 20);
-	//add_child(button);
 
 	cbutton *close_button = new cbutton();;
 	close_button->create({ _width-25,5 }, 15, 15,this,RGB(144,0,0));
@@ -48,14 +45,14 @@ bool cwindow::init() {
 	close_button3->set_type(T_circle_button);
 
 
-	////cmenu *comb = new cmenu(this);
-	////comb->get_root().text = "com1";
-	////comb->get_root()[0].text = "root1";
-	////comb->get_root()[1].text = "root2";
-	////comb->get_root()[2].text = "root3";
-	////comb->get_root()[3].text = "root4";
-	////comb->create({ 65,65 }, 70,90, this,RGB(255, 0, 0));
-	////add_child(comb);
+	//cmenu *comb = new cmenu(this);
+	//comb->get_root().text = "com1";
+	//comb->get_root()[0].text = "root1";
+	//comb->get_root()[1].text = "root2";
+	//comb->get_root()[2].text = "root3";
+	//comb->get_root()[3].text = "root4";
+	//comb->create({ 65,65 }, 70,90, this,RGB(255, 0, 0));
+	//add_child(comb);
 
 	cedit *edit = new cedit();
 	edit->create({ 60,50 }, 100, 200, this, RGB(255, 215, 0));
@@ -79,7 +76,6 @@ bool cwindow::init() {
 
 bool cwindow::update(bool redraw) {
 	erase_bk();
-	_gdi.draw_ellipse({ 50,50 },20, RGB(255, 0, 0));
 	_gdi.draw_frame_rect({ 0,0 }, { _width ,_height }, 10, RGB(255, 0, 0));
 	_gdi.draw_line({ 0,header_height }, { _width,header_height }, 2, RGB(255, 144, 0));
 	_gdi.draw_text(title_, {10,5});

@@ -20,7 +20,7 @@ cedit::~cedit()
 
 bool cedit::update(bool redraw)
 {
-	erase_bk();
+	//erase_bk();
 	_gdi.draw_frame_rect({ 0,0 }, { _width ,_height });
 	if (style_ == T_singleline_edit)
 		_gdi.draw_text(text_, { 2,2 }, _font_height);
