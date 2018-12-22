@@ -45,21 +45,7 @@ bool cwbase::init() {
 bool cwbase::update(bool redraw) {
 	if (_is_show) {
 		for (auto child : _childrend) {
-			if (redraw) {	
-				child->update(redraw);
-			}
-			else
-				child->update_parent();
-		}
-		if (redraw) {
-			update_parent();
-		}
-		else {
-			auto parent = this;
-			while (parent&&parent->get_ctr_type() != T_window) {
-				parent->update_parent();
-				parent = parent->_parent;
-			}
+			child->update(redraw);
 		}
 	}
 	return true;
@@ -78,13 +64,17 @@ bool cwbase::create(c_point op, int width, int height, cwbase *parent, COLORREF 
 	_align = T_v_align_left;
 	_gdi.set_rng(width, height);
 	_gdi.set_refer_point(_left_top);
+	_gdi.pa = this;
 	_gdi.init();
 
 	_parent = parent;
 
 	if (_parent) {
+		_root_point = _parent->get_refer_point() + op;
 		_parent->_childrend.push_back(this);
 	}
+	else
+		_root_point = op;
 	return true;
 }
 
@@ -106,6 +96,11 @@ void cwbase::set_point(c_point point){
 	_left_top = point;
 	_right_bottom = { point.x + _width,point.y + _height };
 	_gdi.set_refer_point(_left_top);
+	if (_parent) {
+		_root_point = _parent->get_refer_point() + point;
+	}
+	else
+		_root_point = point;
 }
 
 void cwbase::set_size(c_point op, int width, int height) {

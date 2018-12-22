@@ -13,6 +13,7 @@ public:
 		if (!(bmp_ = CreateCompatibleBitmap(hdc_, get_console_width(), get_console_height()))) {
 			return false;
 		}
+		SelectObject(buffer_hdc_, bmp_);
 	}
 	static cdc& instance() {
 		static cdc dc;
@@ -37,8 +38,7 @@ public:
 		BitBlt(hdc_, 0, 0, get_console_width(), get_console_height(), buffer_hdc_, 0, 0, SRCCOPY);
 	}
 };
-
-
+class cwbase;
 class cgdi
 {
 public:
@@ -66,6 +66,7 @@ public:
 	c_point refer_c_point_;
 	int width_;
 	int height_;
+	cwbase *pa = nullptr;
 private:
 	HDC hdc_;
 	

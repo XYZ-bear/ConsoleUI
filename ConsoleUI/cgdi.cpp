@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "cgdi.h"
 #include <assert.h>
-
+#include "cwbase.h"
 cgdi::cgdi()
 {
 }
@@ -17,34 +17,42 @@ bool cgdi::init() {
 
 
 void cgdi::draw_line(c_point p1, c_point p2, int width, COLORREF color, int style) {
+	p1 = pa->get_root_point(p1);
+	p2= pa->get_root_point(p2);
 	hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
 	open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
 	MoveToEx(buffer_hdc_, p1.x, p1.y, NULL);
 	LineTo(buffer_hdc_, p2.x, p2.y);
-	SelectObject(hdc_, open_);
+	SelectObject(buffer_hdc_, open_);
 	DeleteObject(hpen_);
 }
 
 void cgdi::draw_retangle(c_point p1, c_point p2, int width, COLORREF color, int style) {
+	p1 = pa->get_root_point(p1);
+	p2 = pa->get_root_point(p2);
 	hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
 	open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
 	Rectangle(buffer_hdc_, p1.x, p1.y, p2.x, p2.y);
-	SelectObject(hdc_, open_);
+	SelectObject(buffer_hdc_, open_);
 	DeleteObject(hpen_);
 }
 
 void cgdi::draw_frame_rect(c_point p1, c_point p2, int width, COLORREF color, int style) {
+	p1 = pa->get_root_point(p1);
+	p2 = pa->get_root_point(p2);
 	hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
 	open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
 	RECT rect{ p1.x,p1 .y,p2.x,p2.y};
 	HBRUSH br = CreateSolidBrush(color);
 	FrameRect(buffer_hdc_, &rect,br);
-	SelectObject(hdc_, open_);
+	SelectObject(buffer_hdc_, open_);
 	DeleteObject(hpen_);
 	DeleteObject(br);
 }
 
 void cgdi::fill_rect(c_point p1, c_point p2, COLORREF color) {
+	p1 = pa->get_root_point(p1);
+	p2 = pa->get_root_point(p2);
 	RECT rect{ p1.x,p1.y,p2.x,p2.y };
 	HBRUSH br = CreateSolidBrush(color);
 	SelectObject(buffer_hdc_,br);
@@ -53,6 +61,7 @@ void cgdi::fill_rect(c_point p1, c_point p2, COLORREF color) {
 }
 
 void cgdi::fill_rect(c_rect r1, COLORREF color) {
+	r1.p = pa->get_root_point(r1.p);
 	RECT rect{ r1.p.x,r1.p.y,r1.p.x + r1.width,r1.p.y + r1.height };
 	HBRUSH br = CreateSolidBrush(color);
 	SelectObject(buffer_hdc_, br);
@@ -61,6 +70,7 @@ void cgdi::fill_rect(c_rect r1, COLORREF color) {
 }
 
 void cgdi::draw_ellipse(c_point p, int len, COLORREF color) {
+	p = pa->get_root_point(p);
 	HBRUSH hBrush = CreateSolidBrush(color);
 	HBRUSH hOldBrush = (HBRUSH)SelectObject(buffer_hdc_, hBrush);
 
@@ -77,6 +87,7 @@ void cgdi::draw_ellipse(c_point p, int len, COLORREF color) {
 }
 
 void cgdi::draw_text(string str, c_point p, int height, COLORREF color) {
+	p = pa->get_root_point(p);
 	RECT rect{ p.x, p.y, p.x + height/2 * str.length(), p.y + height };
 
 	SetBkMode(buffer_hdc_, TRANSPARENT);

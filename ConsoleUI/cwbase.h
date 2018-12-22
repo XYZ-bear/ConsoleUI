@@ -4,7 +4,7 @@
 #include "cevent.h"
 #include <map>
 #include <list>
-
+class cgdi;
 class cwbase:public cevent
 {
 private:
@@ -32,7 +32,7 @@ protected:
 	cwbase *_parent = nullptr;
 	list<cwbase*> _childrend;
 	string _tip_str;
-
+	c_point _root_point;
 public:
 	cwbase();
 	virtual ~cwbase();
@@ -77,6 +77,14 @@ public:
 	c_point get_parent_point(c_point p) {
 		if (_parent)
 			return _parent->get_left_top() + p;
+	}
+
+	c_point get_refer_point() {
+		return _root_point;
+	}
+
+	c_point get_root_point(c_point p) {
+		return _root_point + p;
 	}
 
 	void erase_bk();

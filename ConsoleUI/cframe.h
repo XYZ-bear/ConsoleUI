@@ -20,11 +20,11 @@ public:
 		cwindow *window2 = new cwindow();
 		window2->create("windows2", { 100,60 }, 300, 200);
 
-		//int k = 40;
-		//for (int i = 0; i < 4000; i++) {
-		//	cwindow *window4 = new cwindow();
-		//	window4->create(to_string(i), { k,60 }, 100, 100);
-		//}
+		int k = 40;
+		for (int i = 0; i < 100; i++) {
+			cwindow *window4 = new cwindow();
+			window4->create(to_string(i), { k,60 }, 100, 100);
+		}
 
 		tips.create({ 0,0 }, 100, 20, this);
 		return cwbase::init();
@@ -56,8 +56,6 @@ public:
 		c_point old_root_point;
 
 		while (1) {
-			erase_bk();
-
 			INPUT_RECORD keyRec;
 			DWORD state = 0, res;
 			HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
@@ -68,8 +66,8 @@ public:
 
 			if (num > 0) {
 				ReadConsoleInput(hIn, &keyRec, 1, &res);
-				erase_bk();
-	
+				//erase_bk();
+				//update(true);
 				if (keyRec.EventType == MOUSE_EVENT) {
 					POINT p;
 					GetCursorPos(&p);
@@ -227,6 +225,7 @@ public:
 				break;
 			}
 		}
+		update();
 	}
 
 	void redraw_windows() {

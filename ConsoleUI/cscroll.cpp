@@ -15,7 +15,7 @@ cscroll::~cscroll()
 
 bool cscroll::update(bool redraw)
 {
-	//erase_bk();
+	erase_bk();
 	_gdi.draw_frame_rect({ 0,0 }, { _width ,_height });
 	_gdi.fill_rect({ 0,0 }, { _width ,_height }, _bk_color);
 	_gdi.fill_rect(scroll_bar_, bar_active_color_);
