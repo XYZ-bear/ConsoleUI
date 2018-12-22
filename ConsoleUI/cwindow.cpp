@@ -25,9 +25,6 @@ cwindow::~cwindow()
 bool cwindow::init() {
 	is_mouse_in_header = false;
 	header_height = 30;
-	//cbutton *button = new cbutton();;
-	//button->create({ 10,60 }, 30, 20);
-	//add_child(button);
 
 	cbutton *close_button = new cbutton();;
 	close_button->create({ _width-25,5 }, 15, 15,this,RGB(144,0,0));
@@ -79,7 +76,6 @@ bool cwindow::init() {
 
 bool cwindow::update(bool redraw) {
 	erase_bk();
-	_gdi.draw_ellipse({ 50,50 },20, RGB(255, 0, 0));
 	_gdi.draw_frame_rect({ 0,0 }, { _width ,_height }, 10, RGB(255, 0, 0));
 	_gdi.draw_line({ 0,header_height }, { _width,header_height }, 2, RGB(255, 144, 0));
 	_gdi.draw_text(title_, {10,5});

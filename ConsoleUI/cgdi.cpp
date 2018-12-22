@@ -8,61 +8,58 @@ cgdi::cgdi()
 cgdi::~cgdi()
 {
 }
-
+HDC cgdi::hdc_ = GetDC(GetConsoleWindow());
 void cgdi::init() {
 	buffer_hdc_ = CreateCompatibleDC(NULL);
-	hdc_ = GetDC(GetConsoleWindow());
 	bmp_ = CreateCompatibleBitmap(hdc_, width_, height_); 
-	old_bitmap_ = (HBITMAP)SelectObject(buffer_hdc_, bmp_);
+	SelectObject(buffer_hdc_, bmp_);
 }
 
 void cgdi::draw_line(c_point p1, c_point p2, int width, COLORREF color, int style) {
-	hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
-	open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
+	HPEN hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
+	HPEN open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
 	MoveToEx(buffer_hdc_, p1.x, p1.y, NULL);
 	LineTo(buffer_hdc_, p2.x, p2.y);
-	SelectObject(hdc_, open_);
+	SelectObject(buffer_hdc_, open_);
 	DeleteObject(hpen_);
-	set_change(true);
 }
 
 void cgdi::draw_retangle(c_point p1, c_point p2, int width, COLORREF color, int style) {
-	hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
-	open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
+	HPEN hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
+	HPEN open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
 	Rectangle(buffer_hdc_, p1.x, p1.y, p2.x, p2.y);
-	SelectObject(hdc_, open_);
+	SelectObject(buffer_hdc_, open_);
 	DeleteObject(hpen_);
-	set_change(true);
 }
 
 void cgdi::draw_frame_rect(c_point p1, c_point p2, int width, COLORREF color, int style) {
-	hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
-	open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
+	HPEN hpen_ = CreatePen(style, width, color);//添加画笔属性。d代表宽度,a,b,c用于调颜色
+	HPEN open_ = (HPEN)SelectObject(buffer_hdc_, hpen_);
 	RECT rect{ p1.x,p1 .y,p2.x,p2.y};
 	HBRUSH br = CreateSolidBrush(color);
 	FrameRect(buffer_hdc_, &rect,br);
-	SelectObject(hdc_, open_);
+	SelectObject(buffer_hdc_, open_);
 	DeleteObject(hpen_);
 	DeleteObject(br);
-	set_change(true);
 }
 
 void cgdi::fill_rect(c_point p1, c_point p2, COLORREF color) {
 	RECT rect{ p1.x,p1.y,p2.x,p2.y };
 	HBRUSH br = CreateSolidBrush(color);
-	SelectObject(buffer_hdc_,br);
+	HBRUSH hOldBrush = (HBRUSH)SelectObject(buffer_hdc_, br);
 	FillRect(buffer_hdc_,&rect, br);
+	SelectObject(buffer_hdc_, hOldBrush);
+	DeleteObject(hOldBrush);
 	DeleteObject(br);
-	set_change(true);
 }
 
 void cgdi::fill_rect(c_rect r1, COLORREF color) {
 	RECT rect{ r1.p.x,r1.p.y,r1.p.x + r1.width,r1.p.y + r1.height };
 	HBRUSH br = CreateSolidBrush(color);
-	SelectObject(buffer_hdc_, br);
+	HBRUSH hOldBrush = (HBRUSH)SelectObject(buffer_hdc_, br);
 	FillRect(buffer_hdc_, &rect, br);
+	SelectObject(buffer_hdc_, hOldBrush);
 	DeleteObject(br);
-	set_change(true);
 }
 
 void cgdi::draw_ellipse(c_point p, int len, COLORREF color) {
@@ -79,7 +76,6 @@ void cgdi::draw_ellipse(c_point p, int len, COLORREF color) {
 
 	SelectObject(buffer_hdc_, hOldPen);
 	DeleteObject(hPen);
-	set_change(true);
 }
 
 void cgdi::draw_text(string str, c_point p, int height, COLORREF color) {
@@ -125,5 +121,4 @@ bool cgdi::get_change() {
 void cgdi::release() {
 	//DeleteObject(bmp_);
 	//DeleteObject(hdc_);
-	SelectObject(buffer_hdc_, old_bitmap_);
 }

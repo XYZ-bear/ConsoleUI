@@ -26,14 +26,11 @@ public:
 	c_point refer_c_point_;
 	int width_;
 	int height_;
+	static HDC hdc_;
 private:
-	HDC hdc_;
+	
 	
 	HBITMAP bmp_;
-	HBITMAP old_bitmap_;
-	HPEN hpen_;
-	HPEN open_;
 
 	bool is_change_ = true;
 };
-

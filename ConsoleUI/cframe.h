@@ -20,14 +20,8 @@ public:
 		cwindow *window2 = new cwindow();
 		window2->create("windows2", { 100,60 }, 300, 200);
 
-		//cwindow window3;
-		//window3.create("windows3", { 400,60 }, 300, 200);
-
-		//cframe::instance().add(&window2);
-		//cframe::instance().add(&window3);
-
 		//int k = 40;
-		//for (int i = 0; i < 300; i++) {
+		//for (int i = 0; i < 1000; i++) {
 		//	cwindow *window4 = new cwindow();
 		//	window4->create(to_string(i), { k + i,60 }, 100, 100);
 		//}
@@ -52,11 +46,6 @@ public:
 	}
 
 	void run() {
-
-		HDC hdc = GetDC(GetConsoleWindow());
-		HBITMAP bmp = CreateCompatibleBitmap(hdc, get_console_width(), get_console_height());
-		HDC buffer_hdc = CreateCompatibleDC(NULL);
-		SelectObject(buffer_hdc, bmp);
 		c_point old;
 		if (_childrend.size() > 0)
 			active_ctr = *(--_childrend.end());
@@ -66,10 +55,6 @@ public:
 		c_point old_root_point;
 
 		while (1) {
-			RECT rect{ 0,0,get_console_width(),get_console_height() };
-			HBRUSH br = CreateSolidBrush(RGB(0, 0, 0));
-			FillRect(buffer_hdc, &rect,br);
-			DeleteObject(br);
 
 			INPUT_RECORD keyRec;
 			DWORD state = 0, res;
@@ -132,9 +117,9 @@ public:
 				}
 
 				if (keyRec.EventType == WINDOW_BUFFER_SIZE_EVENT) {
-					DeleteObject(bmp);
+		/*			DeleteObject(bmp);
 					bmp = CreateCompatibleBitmap(hdc, get_console_width(), get_console_height());
-					SelectObject(buffer_hdc, bmp);
+					SelectObject(buffer_hdc, bmp);*/
 				}
 
 				if (keyRec.EventType == KEY_EVENT) {
@@ -150,7 +135,8 @@ public:
 
 			ctimer::instance().check_timer();
 			redraw_windows();
-			BitBlt(hdc, 0, 0, get_console_width(), get_console_height(), get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
+			//BitBlt(hdc, 0, 0, get_console_width(), get_console_height(), get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
+			_gdi.update();
 		}
 	}
 
