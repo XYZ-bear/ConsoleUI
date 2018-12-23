@@ -1,5 +1,9 @@
 #pragma once
 
+/*windows event*/
+#define D_mouse_up_wheel 7864320
+#define D_mouse_down_wheel 4287102976
+
 /*default init*/
 #define D_default_font_height 16       //width=height/2
 
@@ -11,6 +15,7 @@ enum T_ctr_event {
 	T_mouse_move_event,
 	T_mouse_move_in_event,
 	T_mouse_move_out_event,
+	T_mouse_wheeled_event,
 	T_input_key,
 	T_focus,
 	T_drag_event,

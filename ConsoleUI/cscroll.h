@@ -25,7 +25,8 @@ public:
 	void set_bar_drag_color(COLORREF color) { bar_drag_color_ = color; };
 	T_scroll_style get_style() { return style_; };
 	void set_one_step(float step) { one_step_ = step; };
-	void scroll_to(int pos);
+	/*move distance*/
+	void scroll(int xy);
 	void set_range(int min, int max) { min_pos_ = min; max_pos_ = max; };
 private:
 	void scroll_to_(int xy);
@@ -44,5 +45,6 @@ public:
 	void mouse_move_in(c_point p);
 	void mouse_move_out(c_point p);
 	void drag(c_point p);
+	void mouse_wheeled(bool up);
 };
 

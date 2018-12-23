@@ -78,8 +78,24 @@ void cscroll::drag(c_point p) {
 	update();
 }
 
+void cscroll::mouse_wheeled(bool up) {
+	int move;
+	if (up) {
+		move = -1;
+		scroll(-1);
+	}
+	else {
+		move = 1;
+		scroll(1);
+	}
+	update();
+	call_func_(T_scroll_event, &move);
+}
+
 void cscroll::scroll_to_(int xy) {
+	int move = 0;
 	if (style_ == T_h_scroll) {
+		int old_y = scroll_bar_.p.y;
 		int res_y_bottom = xy + scroll_bar_.height;
 		if (xy < scroll_bar_offset)
 			scroll_bar_.p.y = scroll_bar_offset;
@@ -87,6 +103,7 @@ void cscroll::scroll_to_(int xy) {
 			scroll_bar_.p.y = _height - scroll_bar_offset - scroll_bar_.height;
 		else
 			scroll_bar_.p.y = xy;
+		move = scroll_bar_.p.y - old_y;
 	}
 	else if (style_ == T_v_scroll) {
 		int res_y_right = xy + scroll_bar_.width;
@@ -94,6 +111,10 @@ void cscroll::scroll_to_(int xy) {
 			return;
 		scroll_bar_.p.x = xy;
 	}
-	if (call_func_)
-		call_func_(T_scroll_event, nullptr);
+	call_func_(T_scroll_event, &move);
+}
+
+void cscroll::scroll(int xy) {
+	scroll_to_(scroll_bar_.p.y + xy);
+	update();
 }

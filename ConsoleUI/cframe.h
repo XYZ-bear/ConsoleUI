@@ -17,8 +17,8 @@ public:
 		cwindow *window=new cwindow();
 		window->create("windows1", { 10,20 }, 600, 400);
 
-		cwindow *window2 = new cwindow();
-		window2->create("windows2", { 100,60 }, 300, 200);
+		//cwindow *window2 = new cwindow();
+		//window2->create("windows2", { 100,60 }, 300, 200);
 
 		//int k = 40;
 		//for (int i = 0; i < 1000; i++) {
@@ -50,9 +50,9 @@ public:
 		if (_childrend.size() > 0)
 			active_ctr = *(--_childrend.end());
 		
-		c_point data;
-		c_point root_point;
-		c_point old_root_point;
+		c_point data{ 0,0 };
+		c_point root_point{ 0,0 };
+		c_point old_root_point = { 0,0 };
 
 		while (1) {
 
@@ -101,7 +101,7 @@ public:
 					if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
 						if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
 							do_somthing(active_ctr, T_click_in_event, data);
-							do_focus(active_ctr, T_focus, true);
+							do_somthing(active_ctr, T_focus, true);
 							tips.set_is_show(false);
 							if (old_click_ctr != active_ctr)
 								do_somthing(old_click_ctr, T_click_out_event, data);
@@ -114,6 +114,12 @@ public:
 							old_click_ctr = active_ctr;
 						}
 					}
+					if (keyRec.Event.MouseEvent.dwEventFlags == MOUSE_WHEELED) {
+						if (keyRec.Event.MouseEvent.dwButtonState == D_mouse_up_wheel)
+							do_somthing(active_ctr, T_mouse_wheeled_event, true);
+						else
+							do_somthing(active_ctr, T_mouse_wheeled_event, false);
+					}
 				}
 
 				if (keyRec.EventType == WINDOW_BUFFER_SIZE_EVENT) {
@@ -125,8 +131,8 @@ public:
 				if (keyRec.EventType == KEY_EVENT) {
 					if (keyRec.Event.KeyEvent.bKeyDown)
 					{
-						if(active_ctr)
-							active_ctr->do_event(T_input_key, &keyRec.Event.KeyEvent);
+						if(old_click_ctr)
+							old_click_ctr->do_event(T_input_key, &keyRec.Event.KeyEvent);
 					}
 				}
 			}
@@ -135,7 +141,6 @@ public:
 
 			ctimer::instance().check_timer();
 			redraw_windows();
-			//BitBlt(hdc, 0, 0, get_console_width(), get_console_height(), get_gdi().buffer_hdc_, 0, 0, SRCCOPY);
 			_gdi.update();
 		}
 	}
@@ -206,7 +211,7 @@ public:
 		ctr->do_event(id, &data);
 	}
 
-	bool do_focus(cwbase* ctr, T_ctr_event id, bool data) {
+	bool do_somthing(cwbase* ctr, T_ctr_event id, bool data) {
 		if (!ctr)
 			return false;
 		ctr->set_is_focus(data);

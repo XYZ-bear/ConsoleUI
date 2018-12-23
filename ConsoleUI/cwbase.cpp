@@ -130,7 +130,7 @@ c_point &cwbase::get_right_bottom() {
 }
 
 void cwbase::erase_bk() {
-	_gdi.fill_rect({ 0,0 }, { _width ,_height },RGB(0,0,0));
+	_gdi.fill_rect({ 0,0 }, { _width ,_height },_bk_color);
 }
 
 void cwbase::update_parent() {
@@ -182,6 +182,8 @@ void cwbase::do_event(T_ctr_event id, const void *data) {
 	case T_mouse_move_in_event:mouse_move_in(*(c_point*)data);
 		break;
 	case T_mouse_move_out_event:mouse_move_out(*(c_point*)data);
+		break;
+	case T_mouse_wheeled_event:mouse_wheeled(*(bool*)data);
 		break;
 	case T_input_key:input_key(*(c_key*)data);
 		break;

@@ -55,15 +55,16 @@ bool cwindow::init() {
 	////add_child(comb);
 
 	cedit *edit = new cedit();
-	edit->create({ 60,50 }, 100, 200, this, RGB(255, 215, 0));
+	edit->set_font_height(26);
+	edit->create({ 60,50 }, 500, 300, this, RGB(0, 0, 0));
 	edit->set_style(T_multiline_edit);
 
-	cscroll *scroll = new cscroll();
-	scroll->create({ 310,30 }, 12, 200, this);
-	scroll->set_bk_color(RGB(62,62,62));
-	scroll->set_bar_color(RGB(104,104,104));
-	scroll->set_bar_drag_color(RGB(200,200,200));
-	scroll->set_tip("¹ö¹ö¶´");
+	//cscroll *scroll = new cscroll();
+	//scroll->create({ 310,30 }, 12, 200, this);
+	//scroll->set_bk_color(RGB(62,62,62));
+	//scroll->set_bar_color(RGB(104,104,104));
+	//scroll->set_bar_drag_color(RGB(200,200,200));
+	//scroll->set_tip("¹ö¹ö¶´");
 
 	//cscroll *scrollv = new cscroll();
 	//scrollv->create({ 100,300 }, 200, 12, this);

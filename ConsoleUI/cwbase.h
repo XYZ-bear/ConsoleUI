@@ -28,6 +28,7 @@ protected:
 	bool _is_focus;
 	bool _is_show = true;
 	int _font_height = D_default_font_height;
+	int _font_width = D_default_font_height / 2;
 
 	cwbase *_parent = nullptr;
 	list<cwbase*> _childrend;
@@ -67,7 +68,7 @@ public:
 	bool is_show() { return _is_show; }
 	void set_is_show(bool is) { _is_show = is; }
 
-	void set_font_height(int height) { _font_height = height; }
+	void set_font_height(int height) { _font_height = height; _font_width = height / 2; }
 	int get_font_size() { return _font_height; }
 
 	c_point get_client_point(c_point p) {
@@ -111,13 +112,14 @@ public:
 public:
 	virtual bool init();
 	virtual bool update(bool redraw = false);
-	virtual bool create( c_point op, int width, int height, cwbase *parent=nullptr, COLORREF _bk_color = RGB(255, 255, 255));
+	virtual bool create( c_point op, int width, int height, cwbase *parent=nullptr, COLORREF _bk_color = RGB(0, 0, 0));
 	virtual void click_in(c_point p) { };
 	virtual void click_out(c_point p) { };
 	virtual void double_click(c_point p) { };
 	virtual void mouse_move(c_point p){ };
 	virtual void mouse_move_in(c_point p) { };
 	virtual void mouse_move_out(c_point p) { };
+	virtual void mouse_wheeled(bool up) {};
 	virtual void input_key(c_key key) { };
 	virtual void focus() { };
 	virtual void drag(c_point p) { };
