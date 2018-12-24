@@ -27,12 +27,12 @@ bool cedit::update(bool redraw)
 	if (style_ == T_singleline_edit)
 		_gdi.draw_text(text_, off_margin_, _font_height);
 	else {
-		int ypos = scroll_xy.y + off_margin_.y + line_off;
+		int ypos = off_margin_.y + line_off;
 		int xpos = scroll_xy.x + off_margin_.x ;
 
-
-		for (auto &text : v_text_) {
-			_gdi.draw_text(text, { xpos,ypos }, _font_height);
+		int len = start_line_ + max_line_;
+		for (int i = start_line_; i < len; i++) {
+			_gdi.draw_text_t(v_text_[i], { xpos,ypos }, _font_height);
 			ypos += _font_height + line_off;
 		}
 	}
@@ -43,14 +43,16 @@ bool cedit::update(bool redraw)
 void cedit::draw_select() {
 	if (drag_start_point_ == drag_end_point_)
 		return;
-	spin_point = drag_end_point_;
+	
 	int begin_index = get_point_line_index(drag_start_point_);
 	int end_index = get_point_line_index(drag_end_point_);
 	if (begin_index > end_index)
 		swap(begin_index, end_index);
 	c_point start_point = get_point_spin_xy(drag_start_point_);
 	c_point end_point = get_point_spin_xy(drag_end_point_);
-	if (start_point > end_point)
+	spin_point = end_point;
+
+	if (start_point.y > end_point.y)
 		swap(start_point, end_point);
 
 	if (begin_index == end_index)
@@ -98,10 +100,10 @@ bool cedit::init() {
 	scroll_->set_bar_drag_color(RGB(200, 200, 200));
 	scroll_->add_cmd(this, T_scroll_event, &cedit::on_scroll);
 
-	max_line_ = _height/(_font_height + line_off);
+	max_line_ = get_max_line();
 	text_rect_ = {off_margin_,_width-scroll_->get_width(),_height};
 
-	ifstream myfile("ccombox.cpp");
+	ifstream myfile("log_2018-10-30.txt");
 	string temp;
 	myfile.is_open();
 	while (getline(myfile, temp))
@@ -185,22 +187,51 @@ void cedit::input_key(c_key key) {
 }
 
 void cedit::scroll_x(int dis) {
-	int x = scroll_xy.x + dis;
-	if (x <= 0)
-		scroll_xy.x = 0;
+	if (dis < 0) {//spin
+		if (scroll_xy.x >= 0) { //to up line
+			int index = get_point_line_index(spin_point);
+			if (index == 0)     //first line
+				return;
+			int end_x = get_text_end_x(get_index_line_text(index - 1));
+			if (end_x > text_rect_.width) {  //up line over right
+				spin_point.x = get_point_spin_xy({ text_rect_.width,0 }).x;
+			}
+			else
+				spin_point.x = end_x;
+		}
+		else {
+			scroll_xy.x += _font_width;
+			drag_start_point_.x += _font_width;
+		}
+	}
+	else if (dis > _width) {
+		int end_x = get_text_end_x(get_point_line_text(spin_point));
+		if (text_rect_.width - scroll_xy.x > end_x) {
+			spin_point.x = off_margin_.x;
+		}
+		else {
+			scroll_xy.x -= _font_width;
+			drag_start_point_.x -= _font_width;
+		}
+	}
+	else
+		spin_point.x = dis;
 }
 
 void cedit::scroll_y(int dis) {
 	scroll_xy.y += dis;
 	if (scroll_xy.y >= 0)
 		scroll_xy.y = 0;
-	drag_end_point_.y += dis;
-	drag_start_point_.y += dis;
+	if (start_line_ != 0) {
+		drag_end_point_.y += dis;
+		drag_start_point_.y += dis;
+	}
+	change_start_line((-dis) / (_font_height + line_off));
 }
 
 void cedit::on_scroll(const void *data) {
 	int move = *(int*)data;
-	scroll_xy.y += (-move);
+	//scroll_xy.y += (-move);
 	update();
 }
 
@@ -208,7 +239,7 @@ void cedit::mouse_wheeled(bool up) {
 	if (up) {
 		scroll_->scroll(-(scroll_->get_height()*(_font_height + line_off) / _height));
 		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000))
-			set_font_height(get_font_size() + 2);
+			change_font_height(get_font_size() + 2);
 		else
 			scroll_y(_font_height + line_off);
 		//scroll_xy.y += (_font_height + line_off);
@@ -216,7 +247,7 @@ void cedit::mouse_wheeled(bool up) {
 	else {
 		scroll_->scroll(scroll_->get_height()*(_font_height + line_off) / _height);
 		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000))
-			set_font_height(get_font_size() - 2);
+			change_font_height(get_font_size() - 2);
 		else
 			scroll_y(-(_font_height + line_off));
 		//scroll_xy.y -= _font_height + line_off;
@@ -318,7 +349,7 @@ string &cedit::get_end_line_text() {
 
 void cedit::insert_ch(char ch) {
 	string &text = get_point_line_text(spin_point);
-	int index_x = (spin_point.x - off_margin_.x) / _font_width;
+	int index_x = abs(scroll_xy.x)/_font_width+(spin_point.x - off_margin_.x) / _font_width;
 	if (index_x > text.size())
 		index_x = text.size() - 1;
 	text.insert(text.begin() + index_x , ch);
@@ -374,7 +405,15 @@ void cedit::set_spin_y(int p) {
 }
 
 void cedit::drag(c_point p) {
-	drag_end_point_ += p;
+	//drag_end_point_ += p;
+	scroll_x(spin_point.x + p.x);
+	if (drag_end_point_.y > _height)
+		scroll_y(-(_font_height + line_off));
+	else if (drag_end_point_.y < 0) {
+		scroll_y(_font_height + line_off);
+	}
+	else
+		drag_end_point_ += p;
 	update();
 }
 
@@ -386,4 +425,26 @@ void cedit::select_all() {
 	drag_start_point_ = { 0,0 };
 	drag_end_point_ = { _width,_height };
 	update();
+}
+
+uint16_t cedit:: get_max_line() {
+	return _height / (_font_height + line_off);
+}
+
+void cedit::change_font_height(int height) {
+	set_font_height(height);
+	max_line_ = get_max_line();
+}
+
+void cedit::change_start_line(int move) {
+	auto t_new_line = start_line_ + move;
+	if (move > 0) {
+		if (t_new_line < start_line_)
+			return;
+	}
+	else if (move < 0) {
+		if (t_new_line > start_line_)
+			return;
+	}
+	start_line_ = t_new_line;
 }

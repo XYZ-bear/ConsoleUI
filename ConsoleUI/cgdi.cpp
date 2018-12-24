@@ -96,6 +96,24 @@ void cgdi::draw_text(string str, c_point p, int height, COLORREF color) {
 	set_change(true);
 }
 
+void cgdi::draw_text_t(string &str, c_point p, int height, COLORREF color) {
+	RECT rect{ p.x, p.y, p.x + height / 2 * str.length(), p.y + height };
+
+	SetBkMode(buffer_hdc_, TRANSPARENT);
+	SetTextColor(buffer_hdc_, color);
+	HFONT hFont;
+
+	hFont = CreateFont(height, 0, 0, 0, FW_DONTCARE, false, false, false,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		FF_DONTCARE, "ÐÂËÎÌå");//Microsoft Yahei UI
+
+	SelectObject(buffer_hdc_, hFont);
+	DrawText(buffer_hdc_, str.c_str(), str.length(), &rect, DT_SINGLELINE | DT_LEFT | DT_VCENTER);
+	DeleteObject(hFont);
+	set_change(true);
+}
+
 void cgdi::set_refer_point(c_point rp) { refer_c_point_ = rp; }
 
 void cgdi::set_rng(int width, int height) {

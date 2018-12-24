@@ -48,6 +48,10 @@ public:
 
 	void draw_select();
 	void select_all();
+
+	uint16_t get_max_line();
+	void change_font_height(int height);
+	void change_start_line(int move);
 private:
 	bool is_spin;
 	int spin_x_;
@@ -60,7 +64,7 @@ private:
 	T_edit_style style_= T_singleline_edit;
 	cscroll *scroll_ = nullptr;
 	vector<string> v_text_;
-	uint16_t start_line_ = 0;
+	uint32_t start_line_ = 0;
 	uint16_t max_line_;
 	uint8_t line_off = 1;
 	c_point spin_point{ 0,0 };

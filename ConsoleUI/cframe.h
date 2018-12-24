@@ -67,12 +67,12 @@ public:
 			if (num > 0) {
 				ReadConsoleInput(hIn, &keyRec, 1, &res);
 				erase_bk();
-	
+			
 				if (keyRec.EventType == MOUSE_EVENT) {
 					POINT p;
 					GetCursorPos(&p);
 					ScreenToClient(GetConsoleWindow(), &p);
-					
+
 					if (keyRec.Event.MouseEvent.dwEventFlags == MOUSE_MOVED) {
 						data = { p.x ,p.y };
 						root_point = data;
@@ -82,7 +82,7 @@ public:
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
 							do_somthing(old_move_ctr, T_drag_event, root_point - old_root_point);
 							old_root_point = root_point;
-							continue;
+							goto update;
 						}
 
 						if (old_move_ctr != active_ctr) {
@@ -99,6 +99,7 @@ public:
 						}
 					}
 					if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
+
 						if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
 							do_somthing(active_ctr, T_click_in_event, data);
 							do_somthing(active_ctr, T_focus, true);
@@ -114,6 +115,13 @@ public:
 							old_click_ctr = active_ctr;
 						}
 					}
+					else if (keyRec.Event.MouseEvent.dwButtonState == 0) {
+						if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
+							OutputDebugString("release ");
+						}
+
+					}
+
 					if (keyRec.Event.MouseEvent.dwEventFlags == MOUSE_WHEELED) {
 						if (keyRec.Event.MouseEvent.dwButtonState == D_mouse_up_wheel)
 							do_somthing(active_ctr, T_mouse_wheeled_event, true);
@@ -139,6 +147,7 @@ public:
 			else
 				Sleep(1);
 
+			update:
 			ctimer::instance().check_timer();
 			redraw_windows();
 			_gdi.update();

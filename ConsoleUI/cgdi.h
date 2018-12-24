@@ -12,6 +12,7 @@ public:
 	void draw_retangle(c_point p1, c_point p2, int width = 1, COLORREF color = RGB(255, 255, 255), int style = PS_SOLID);
 	void draw_frame_rect(c_point p1, c_point p2, int width = 1, COLORREF color = RGB(255, 255, 255), int style = PS_SOLID);
 	void draw_text(string str, c_point p, int height = D_default_font_height, COLORREF color = RGB(255, 255, 255));
+	void draw_text_t(string &str, c_point p, int height = D_default_font_height, COLORREF color = RGB(255, 255, 255));
 	void fill_rect(c_point p1, c_point p2, COLORREF color = RGB(255, 255, 255));
 	void fill_rect(c_rect r1, COLORREF color = RGB(255, 255, 255));
 	void draw_ellipse(c_point p1, int len, COLORREF color = RGB(255, 255, 255));
