@@ -472,11 +472,16 @@ bool cedit::update(bool redraw)
 		_gdi.draw_text(text_, off_margin_, _font_height);
 	else {
 		int ypos = off_margin_.y ;
-		int xpos = text_rect_.width - old_spin_point.x;
+		int xpos = off_margin_.x;
+		if (old_spin_point.x > text_rect_.width)
+			xpos += text_rect_.width - old_spin_point.x;
 
 		int len = start_line_ + max_line_;
+		if (v_text_.size() - start_line_ < max_line_)
+			len = v_text_.size() - start_line_;
+
 		for (int i = start_line_; i < len; i++) {
-			_gdi.draw_text_t(v_text_[i], { xpos,ypos }, _font_height);
+			_gdi.draw_text_ex(v_text_[i], { xpos,ypos }, _font_height);
 			ypos += _font_height + line_off;
 		}
 	}
@@ -519,6 +524,9 @@ void cedit::click_in(c_point p) {
 	//ctimer::instance().add_timer(this, 500, &cedit::test);
 
 	spin_point = get_point_spin_xy(p);
+
+	OutputDebugString(to_string(get_spin_ch_pos_in_text()).c_str());
+
 	drag_start_point_ = p;
 	drag_end_point_ = p;
 	set_timer(this, 500, &cedit::test);
@@ -547,12 +555,12 @@ bool cedit::init() {
 	line_height_ = _font_height + line_off;
 	max_line_ = text_rect_.height / line_height_;
 
-	ifstream myfile("log_2018-10-30.txt");
+	ifstream myfile("cframe.h");
 	string temp;
 	myfile.is_open();
 	while (getline(myfile, temp))
 	{
-		parase_tab(temp);
+		//parase_tab(temp);
 		v_text_.push_back(temp);
 	}
 	myfile.close();
@@ -623,10 +631,12 @@ void cedit::input_key(c_key key) {
 		spin_left();
 	}
 	else if (key.wVirtualKeyCode == VK_UP) {
-		spin_point.y -= (_font_height + line_off);
+		//spin_point.y -= (_font_height + line_off);
+		spin_up();
 	}
 	else if (key.wVirtualKeyCode == VK_DOWN) {
-		spin_point.y += (_font_height + line_off);
+		//spin_point.y += (_font_height + line_off);
+		spin_down();
 	}
 	if (key.uChar.AsciiChar != 0) {
 		insert_ch(key.uChar.AsciiChar);
@@ -676,7 +686,7 @@ void cedit::scroll_y(int dis) {
 		drag_end_point_.y += dis;
 		drag_start_point_.y += dis;
 	}
-	change_start_line((-dis) / (_font_height + line_off));
+	change_start_line((-dis) / (line_height_));
 }
 
 void cedit::on_scroll(const void *data) {
@@ -740,7 +750,9 @@ void cedit::parase_tab(string &text) {
 }
 
 c_point cedit::get_point_spin_xy(c_point p) {
-	long x = (p.x - off_margin_.x) / _font_width;
+	spin_point.x = (p.x - off_margin_.x) / _font_width;
+	long x = get_spin_ch_pos();// (p.x - off_margin_.x) / _font_width;
+	//OutputDebugString(to_string(x).c_str());
 	long y = start_line_ + (p.y - off_margin_.y) / line_height_;
 	return { x,y };
 }
@@ -794,14 +806,65 @@ string &cedit::get_end_line_text() {
 
 void cedit::insert_ch(char ch) {
 	string &text = get_index_line_text(spin_point.y);
-	text.insert(text.begin() + spin_point.x, ch);
-	spin_right();
+	text.insert(text.begin() + get_spin_ch_pos_in_text(), ch);
+	if (ch == '\t')
+		spin_right(TAB_WIDTH);
+	else
+		spin_right();
+}
+
+int cedit::get_spin_ch_pos() {
+	vector<string> v_str;
+	string &text = get_index_line_text(spin_point.y);
+	split_with_ch(text,'\t',v_str);
+	int start = 0;
+	for (auto &s : v_str) {
+		if (s == "\t") {
+			if (start+ TAB_WIDTH >= spin_point.x)
+				return start;
+			start += TAB_WIDTH;
+		}
+		else {
+			start += s.size();
+			if (start >= spin_point.x) 
+				return spin_point.x;
+		}
+	}
+	return start;
+}
+
+int cedit::get_spin_ch_pos_in_text() {
+	vector<string> v_str;
+	string &text = get_index_line_text(spin_point.y);
+	split_with_ch(text, '\t', v_str);
+	int start = 0;
+	int index = 0;
+	for (auto &s : v_str) {
+		if (s == "\t") {
+			if (start + TAB_WIDTH >= spin_point.x)
+				return index;
+			start += TAB_WIDTH;
+			index++;
+		}
+		else {
+			
+			if (start+ s.size() >= spin_point.x)
+				return index + spin_point.x - start;
+			start += s.size();
+			index += s.size() - 1;
+		}
+	}
+	return index;
 }
 
 void cedit::delete_ch() {
 	string &text = get_index_line_text(spin_point.y);
-	text.erase(text.begin() + spin_point.x - 1);
-	spin_left();
+	if (spin_point.x == 0)
+		spin_up_end();
+	else {
+		text.erase(text.begin() + spin_point.x - 1);
+		spin_left();
+	}
 }
 
 //void cedit::set_spin_x(int p) {
@@ -903,16 +966,16 @@ void cedit::spin_down_begin() {
 	}
 }
 
-void cedit::spin_left() {
+void cedit::spin_left(int step /*= 1*/) {
 	if (spin_point.x > 0)
 		spin_point.x--;
 	else
 		spin_up_end();
 }
 
-void cedit::spin_right() {
+void cedit::spin_right(int step /*= 1*/) {
 	if (spin_point.x < v_text_[spin_point.y].size())
-		spin_point.x++;
+		spin_point.x+=step;
 	else
 		spin_down_begin();
 }
@@ -921,6 +984,32 @@ c_point cedit::get_spin_real_point() {
 	int x = spin_point.x*_font_width + off_margin_.x;
 	int y = (spin_point.y - (long)start_line_)*line_height_ + off_margin_.y;
 	return { x,y };
+}
+
+void cedit::spin_up(int step /*= 1*/) {
+	if (is_spin_top_line())
+		change_start_line(-1);
+	if (spin_point.y > 0)
+		spin_point.y--;
+}
+
+void cedit::spin_down(int step /*= 1*/) {
+	if (spin_point.y < v_text_.size())
+		spin_point.y += step;
+	if (is_spin_bottom_line())
+		change_start_line(1);
+}
+
+bool cedit::is_spin_top_line() {
+	if (start_line_ == spin_point.y)
+		return true;
+	return false;
+}
+
+bool cedit::is_spin_bottom_line() {
+	if (max_line_ == spin_point.y - start_line_)
+		return true;
+	return false;
 }
 
 string cedit::get_GB(string &str, int index) {

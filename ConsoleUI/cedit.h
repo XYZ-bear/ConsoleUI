@@ -9,6 +9,8 @@ enum T_edit_style
 	T_singleline_edit
 };
 
+#define TAB_WIDTH 3
+
 class cedit :
 	public cwbase
 {
@@ -41,6 +43,8 @@ public:
 	//uint16_t get_text_end_x(string &text);
 	//uint16_t get_end_line_y();
 	void insert_ch(char ch);
+	int get_spin_ch_pos();
+	int get_spin_ch_pos_in_text();
 	void delete_ch();
 	//void set_spin_x(int p);
 	//void set_spin_y(int p);
@@ -55,9 +59,14 @@ public:
 	void change_start_line(int move);
 	void spin_up_end();
 	void spin_down_begin();
-	void spin_left();
-	void spin_right();
+	void spin_left(int step = 1);
+	void spin_right(int step = 1);
+	void spin_up(int step = 1);
+	void spin_down(int step = 1);
+	bool is_spin_bottom_line();
+	bool is_spin_top_line();
 	c_point get_spin_real_point();
+	string get_spin_ch();
 	string get_GB(string &str,int index);
 private:
 	bool is_spin;
@@ -76,7 +85,7 @@ private:
 	uint8_t line_off = 1;
 	uint8_t line_height_;
 	c_point spin_point{ 0,0 };
-	c_point old_spin_point;
+	c_point old_spin_point{ 0,0 };
 	c_point off_margin_{ 2,2 };
 	c_rect text_rect_{ 0,0 };
 

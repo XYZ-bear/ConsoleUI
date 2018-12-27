@@ -1,4 +1,4 @@
-#pragma once
+#pragma once  //sf	fsdf			dsd
 
 #include "cwindow.h"
 #include <list>

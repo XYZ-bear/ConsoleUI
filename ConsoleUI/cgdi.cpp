@@ -114,6 +114,37 @@ void cgdi::draw_text_t(string &str, c_point p, int height, COLORREF color) {
 	set_change(true);
 }
 
+void cgdi::draw_text_ex(string &str, c_point p, int height, COLORREF color) {
+	RECT rect{ p.x, p.y, p.x /*+ height / 2 * str.length()*/, p.y + height };
+
+	SetBkMode(buffer_hdc_, TRANSPARENT);
+	SetTextColor(buffer_hdc_, color);
+	HFONT hFont;
+
+	hFont = CreateFont(height, 0, 0, 0, FW_DONTCARE, false, false, false,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		FF_DONTCARE, "ÐÂËÎÌå");//Microsoft Yahei UI
+
+	SelectObject(buffer_hdc_, hFont);
+	vector<string> v_str;
+	split_with_ch(str, '\t', v_str);
+
+	for (auto &s : v_str) {
+		if (s == "\t") {
+			rect.left = rect.right + 3 * height / 2;
+			rect.right = rect.left;
+		}
+		else {
+			rect.right = rect.left + s.size()*height / 2;
+			DrawText(buffer_hdc_, s.c_str(), s.length(), &rect, DT_SINGLELINE | DT_LEFT | DT_VCENTER);
+		}
+	}
+
+	DeleteObject(hFont);
+	set_change(true);
+}
+
 void cgdi::set_refer_point(c_point rp) { refer_c_point_ = rp; }
 
 void cgdi::set_rng(int width, int height) {
