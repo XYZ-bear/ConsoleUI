@@ -32,17 +32,18 @@ public:
 	void parase_text(string &text);
 	void parase_tab(string &text);
 	c_point get_point_spin_xy(c_point p);
-	c_point get_end_line_spin_xy();
+	//c_point get_end_line_spin_xy();
 	string &get_end_line_text();
-	uint16_t get_point_line_index(c_point p);
-	string &get_point_line_text(c_point p);
+	//uint16_t get_point_line_index(c_point p);
+	//string &get_point_line_text(c_point p);
 	string &get_index_line_text(uint16_t index);
-	string get_point_ch(c_point p);
-	uint16_t get_text_end_x(string &text);
-	uint16_t get_end_line_y();
+	//string get_point_ch(c_point p);
+	//uint16_t get_text_end_x(string &text);
+	//uint16_t get_end_line_y();
 	void insert_ch(char ch);
-	void set_spin_x(int p);
-	void set_spin_y(int p);
+	void delete_ch();
+	//void set_spin_x(int p);
+	//void set_spin_y(int p);
 	void scroll_x(int dis);
 	void scroll_y(int dis);
 
@@ -52,6 +53,12 @@ public:
 	uint16_t get_max_line();
 	void change_font_height(int height);
 	void change_start_line(int move);
+	void spin_up_end();
+	void spin_down_begin();
+	void spin_left();
+	void spin_right();
+	c_point get_spin_real_point();
+	string get_GB(string &str,int index);
 private:
 	bool is_spin;
 	int spin_x_;
@@ -67,6 +74,7 @@ private:
 	uint32_t start_line_ = 0;
 	uint16_t max_line_;
 	uint8_t line_off = 1;
+	uint8_t line_height_;
 	c_point spin_point{ 0,0 };
 	c_point old_spin_point;
 	c_point off_margin_{ 2,2 };

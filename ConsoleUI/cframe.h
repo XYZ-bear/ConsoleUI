@@ -21,9 +21,9 @@ public:
 		//window2->create("windows2", { 100,60 }, 300, 200);
 
 		//int k = 40;
-		//for (int i = 0; i < 1000; i++) {
+		//for (int i = 0; i < 10; i++) {
 		//	cwindow *window4 = new cwindow();
-		//	window4->create(to_string(i), { k + i,60 }, 100, 100);
+		//	window4->create(to_string(i), { k + i,60 }, 600, 400);
 		//}
 		tips.create({ 0,0 }, 100, 20, this);
 		return cwbase::init();
