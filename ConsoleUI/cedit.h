@@ -30,7 +30,7 @@ public:
 	T_edit_style get_style() { return style_; };
 
 	void on_scroll(const void *data);
-
+	void draw_line(int line);
 	void parase_text(string &text);
 	void parase_tab(string &text);
 	c_point get_point_spin_xy(c_point p);
@@ -38,7 +38,7 @@ public:
 	string &get_end_line_text();
 	//uint16_t get_point_line_index(c_point p);
 	//string &get_point_line_text(c_point p);
-	string &get_index_line_text(uint16_t index);
+	string &get_line_text(uint16_t index);
 	//string get_point_ch(c_point p);
 	//uint16_t get_text_end_x(string &text);
 	//uint16_t get_end_line_y();
@@ -69,6 +69,9 @@ public:
 	bool is_spin_top_line();
 	c_point get_spin_real_point(c_point p);
 	string get_spin_ch();
+	int get_point_line(int y);
+	int get_point_line_pos(int x);
+	spin_info get_point_spin_info(c_point p, bool is_screen_point = true);
 	string get_GB(string &str,int index);
 private:
 	bool is_spin;

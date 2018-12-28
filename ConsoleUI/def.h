@@ -104,3 +104,13 @@ struct c_rect {
 		return false;
 	}
 };
+
+struct spin_info
+{
+	int line = 0;
+	int in_line_pos = 0;
+	int in_line_index = 0;
+	char in_line_ch = 0;
+	char pre_ch = 0;
+	char next_ch = 0;
+};

@@ -471,11 +471,6 @@ bool cedit::update(bool redraw)
 	if (style_ == T_singleline_edit)
 		_gdi.draw_text(text_, off_margin_, _font_height);
 	else {
-		int ypos = off_margin_.y ;
-		int xpos = off_margin_.x;
-		if (old_spin_point.x > text_rect_.width)
-			xpos += text_rect_.width - old_spin_point.x;
-
 		int len = start_line_ + max_line_;
 		if (v_text_.size() - start_line_ < max_line_)
 			len = v_text_.size() - start_line_;
@@ -487,21 +482,21 @@ bool cedit::update(bool redraw)
 		//c_point ep = get_spin_real_point(end_point);
 
 		for (int i = start_line_; i < len; i++) {
-
-			//if (i > start_point.y&&i < end_point.y) {
-			//	_gdi.fill_rect(sp, { ep.x,sp.y + line_height_}, RGB(0, 144, 244));
-			//	sp = get_spin_real_point(start_point);
-			//	ep = get_spin_real_point(end_point);
-			//}
-			if (i == spin_point.y)
-				_gdi.draw_frame_rect({ text_rect_.p.x ,ypos }, { text_rect_.p.x+ text_rect_.width,ypos + line_height_ }, 2, RGB(70, 70, 70));
-
-			_gdi.draw_text_ex(v_text_[i], { xpos,ypos }, _font_height);
-			ypos += line_height_;
+			draw_line(i);
 		}
 	}
 
 	return cwbase::update(redraw);
+}
+
+void cedit::draw_line(int line) {
+	int ypos = (line-start_line_)*line_height_;
+	int xpos = off_margin_.x;
+	if (old_spin_point.x > text_rect_.width)
+		xpos += text_rect_.width - old_spin_point.x;
+	if (line == spin_point.y)
+		_gdi.draw_frame_rect({ text_rect_.p.x ,ypos }, { text_rect_.p.x + text_rect_.width,ypos + line_height_ }, 2, RGB(70, 70, 70));
+	_gdi.draw_text_ex(v_text_[line], { xpos,ypos }, _font_height);
 }
 
 void cedit::draw_select() {
@@ -546,7 +541,7 @@ void cedit::click_in(c_point p) {
 
 	spin_point = get_point_spin_xy(p);
 
-	OutputDebugString(to_string(get_spin_ch_pos_in_text()).c_str());
+	//OutputDebugString(to_string(get_spin_ch_pos_in_text()).c_str());
 
 	drag_start_point_ = p;
 	drag_end_point_ = p;
@@ -770,15 +765,12 @@ void cedit::parase_tab(string &text) {
 }
 
 c_point cedit::get_point_spin_xy(c_point p) {
-	spin_point.x = (p.x - off_margin_.x) / _font_width;
-	long x = get_spin_ch_pos();// (p.x - off_margin_.x) / _font_width;
-	//OutputDebugString(to_string(x).c_str());
-	long y = start_line_ + (p.y - off_margin_.y) / line_height_;
-	return { x,y };
+	spin_info info = get_point_spin_info(p);
+	return { info.in_line_pos,info.line };
 }
 
 
-string &cedit::get_index_line_text(uint16_t index) {
+string &cedit::get_line_text(uint16_t index) {
 	if (index < 0)
 		index = 0;
 	if (index > v_text_.size())
@@ -786,42 +778,45 @@ string &cedit::get_index_line_text(uint16_t index) {
 	return v_text_[index];
 }
 
-//string cedit::get_point_ch(c_point p) {
-//	/*string &text = get_point_line_text(p);
-//	int x_ch = p.x / _font_width;
-//	for(auto &ch:text)*/
-//	return "";
-//}
-
-//c_point cedit::get_end_line_spin_xy() {
-//	int x = (*--v_text_.end()).size()*_font_width + off_margin_.x;
-//	int y = (v_text_.size() - start_line_)*(_font_height + line_off) + line_off + off_margin_.x;
-//	return { x,y };
-//}
-
 string &cedit::get_end_line_text() {
 	return *--v_text_.end();
 }
 
 void cedit::insert_ch(char ch) {
-	string &text = get_index_line_text(spin_point.y);
-	text.insert(text.begin() + get_spin_ch_pos_in_text(), ch);
+	string &text = get_line_text(spin_point.y);
+	text.insert(text.begin() + get_spin_ch_pos_in_text() + 1, ch);
 	if (ch == '\t')
 		spin_right(TAB_WIDTH);
 	else
 		spin_right();
 }
 
+void cedit::delete_ch() {
+	string &text = get_line_text(spin_point.y);
+	if (spin_point.x == 0)
+		spin_up_end();
+	else {
+		spin_info info = get_point_spin_info(spin_point, false);
+		if (info.in_line_ch == '\t')
+			spin_left(TAB_WIDTH);
+		else
+		    spin_left();
+		
+		text.erase(text.begin() + info.in_line_index);
+	}
+}
+
 int cedit::get_spin_ch_pos() {
 	vector<string> v_str;
-	string &text = get_index_line_text(spin_point.y);
+	string &text = get_line_text(spin_point.y);
 	split_with_ch(text,'\t',v_str);
 	int start = 0;
 	for (auto &s : v_str) {
 		if (s == "\t") {
-			if (start+ TAB_WIDTH >= spin_point.x)
-				return start;
 			start += TAB_WIDTH;
+			if (start >= spin_point.x)
+				return start;
+			
 		}
 		else {
 			start += s.size();
@@ -835,85 +830,27 @@ int cedit::get_spin_ch_pos() {
 /*get the index of spin in the text*/
 int cedit::get_spin_ch_pos_in_text() {
 	vector<string> v_str;
-	string &text = get_index_line_text(spin_point.y);
+	string &text = get_line_text(spin_point.y);
 	split_with_ch(text, '\t', v_str);
 	int start = 0;
 	int index = 0;
 	for (auto &s : v_str) {
 		if (s == "\t") {
-			if (start + TAB_WIDTH >= spin_point.x)
-				return index;
 			start += TAB_WIDTH;
+			if (start >= spin_point.x)
+				return index;
 			index++;
 		}
 		else {
 			
 			if (start+ s.size() >= spin_point.x)
-				return index + spin_point.x - start;
+				return index + spin_point.x - start -1;
 			start += s.size();
-			index += s.size() - 1;
+			index += s.size();
 		}
 	}
 	return index;
 }
-
-void cedit::delete_ch() {
-	string &text = get_index_line_text(spin_point.y);
-	if (spin_point.x == 0)
-		spin_up_end();
-	else {
-		text.erase(text.begin() + spin_point.x - 1);
-		spin_left();
-	}
-}
-
-//void cedit::set_spin_x(int p) {
-//	if (p < 0) {//spin
-//		if (scroll_xy.x >= 0) { //to up line
-//			int index = get_point_line_index(spin_point);
-//			if (index == 0)     //first line
-//				return;
-//			int end_x = get_text_end_x(get_index_line_text(index - 1));
-//			spin_point.y -= (_font_height + line_off);
-//			if (end_x > text_rect_.width) {  //up line over right
-//				scroll_xy.x = -(end_x - text_rect_.width);
-//				spin_point.x = get_point_spin_xy({ text_rect_.width,0 }).x;
-//			}
-//			else
-//				spin_point.x = end_x;
-//		}
-//		else
-//			scroll_xy.x += _font_width;
-//	}
-//	else if (p > _width) {
-//		int end_x = get_text_end_x(get_point_line_text(spin_point));
-//		if (text_rect_.width - scroll_xy.x > end_x) {
-//			scroll_xy.x = 0;
-//			spin_point.y += (_font_height + line_off);
-//			spin_point.x = off_margin_.x;
-//		}
-//		else
-//			scroll_xy.x -= _font_width;
-//	}
-//	else
-//		spin_point.x = p;
-//}
-
-//void cedit::set_spin_y(int p) {
-//	int x = _width - scroll_xy.x;
-//	int end_x = get_text_end_x(get_point_line_text(spin_point));
-//	if (x > end_x) {
-//		scroll_xy.x = 0;
-//		spin_point.y += (_font_height + line_off);
-//		spin_point.x = off_margin_.x;
-//	}
-//
-//	if (p < _width)
-//		spin_point.x = p;
-//	else if (x < end_x) {
-//		scroll_xy.x -= _font_width;
-//	}
-//}
 
 void cedit::drag(c_point p) {
 	
@@ -955,7 +892,7 @@ void cedit::change_start_line(int move) {
 
 int cedit::get_line_width(int line) {
 	vector<string> v_str;
-	string &text = get_index_line_text(line);
+	string &text = get_line_text(line);
 	split_with_ch(text, '\t', v_str);
 	int start = 0;
 	for (auto &s : v_str) {
@@ -1026,8 +963,13 @@ bool cedit::is_spin_top_line() {
 }
 
 int cedit::get_next_spin_step_x(bool is_left) {
+	//spin_info info = get_point_spin_info(spin_point, false);
+	//string &text = get_line_text(spin_point.y);
+	//if (is_left) {
+
+	//}
 	vector<string> v_str;
-	string &text = get_index_line_text(spin_point.y);
+	string &text = get_line_text(spin_point.y);
 	split_with_ch(text, '\t', v_str);
 	int start = 0;
 	int next = is_left > 0 ? spin_point.x - 1 : spin_point.x + 1;
@@ -1050,6 +992,69 @@ bool cedit::is_spin_bottom_line() {
 	if (max_line_ == spin_point.y - start_line_)
 		return true;
 	return false;
+}
+
+int cedit::get_point_line(int y) {
+	return start_line_ + (y - off_margin_.y) / line_height_;
+}
+
+int cedit::get_point_line_pos(int x) {
+	return (x - off_margin_.x) / _font_width;
+}
+
+spin_info cedit::get_point_spin_info(c_point p, bool is_screen_point) {
+	spin_info info;
+	int x;
+	if (is_screen_point) {
+		info.line = get_point_line(p.y);
+		x = get_point_line_pos(p.x);;
+	}
+	else {
+		info.line = p.y;
+		x = p.x;
+	}
+
+	vector<string> v_str;
+	string &text = get_line_text(info.line);
+	if (text.size() == 0)
+		return info;
+
+
+	split_with_ch(text, '\t', v_str);
+	int start = 0;
+	int index = 0;
+	
+	for (auto &s : v_str) {
+		if (s == "\t") {
+			start += TAB_WIDTH;
+			if (start >= x) {
+				info.in_line_pos = start;
+				info.in_line_index = index;
+				info.in_line_ch = text[info.in_line_index];
+				if (info.in_line_index >= 1)
+					info.pre_ch = text[info.in_line_index - 1];
+				info.pre_ch = text[info.in_line_index + 1];
+				return info;
+			}
+			index++;
+		}
+		else {
+			if (start + s.size() >= x) {
+				info.in_line_index = index + x - start - 1;
+				info.in_line_pos = x;
+				info.in_line_ch = text[info.in_line_index];
+				if (info.in_line_index >= 1)
+					info.pre_ch = text[info.in_line_index - 1];
+				info.pre_ch = text[info.in_line_index + 1];
+				return info;
+			}
+			start += s.size();
+			index += s.size();
+		}
+	}
+	info.in_line_index = index;
+	info.in_line_pos = start;
+	return info;
 }
 
 string cedit::get_GB(string &str, int index) {
