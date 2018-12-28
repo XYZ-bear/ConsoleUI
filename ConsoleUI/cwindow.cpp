@@ -56,7 +56,7 @@ bool cwindow::init() {
 
 	cedit *edit = new cedit();
 	edit->set_font_height(16);
-	edit->create({ 60,50 }, 500, 300, this, RGB(0, 0, 0));
+	edit->create({ 60,50 }, 500, 300, this, RGB(30, 30, 30));
 	edit->set_style(T_multiline_edit);
 
 	//cscroll *scroll = new cscroll();

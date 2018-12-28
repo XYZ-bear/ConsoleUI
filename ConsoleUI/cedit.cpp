@@ -480,9 +480,24 @@ bool cedit::update(bool redraw)
 		if (v_text_.size() - start_line_ < max_line_)
 			len = v_text_.size() - start_line_;
 
+
+		//c_point start_point = get_point_spin_xy(drag_start_point_);
+		//c_point end_point = get_point_spin_xy(drag_end_point_);
+		//c_point sp = get_spin_real_point(start_point);
+		//c_point ep = get_spin_real_point(end_point);
+
 		for (int i = start_line_; i < len; i++) {
+
+			//if (i > start_point.y&&i < end_point.y) {
+			//	_gdi.fill_rect(sp, { ep.x,sp.y + line_height_}, RGB(0, 144, 244));
+			//	sp = get_spin_real_point(start_point);
+			//	ep = get_spin_real_point(end_point);
+			//}
+			if (i == spin_point.y)
+				_gdi.draw_frame_rect({ text_rect_.p.x ,ypos }, { text_rect_.p.x+ text_rect_.width,ypos + line_height_ }, 2, RGB(70, 70, 70));
+
 			_gdi.draw_text_ex(v_text_[i], { xpos,ypos }, _font_height);
-			ypos += _font_height + line_off;
+			ypos += line_height_;
 		}
 	}
 
@@ -490,34 +505,40 @@ bool cedit::update(bool redraw)
 }
 
 void cedit::draw_select() {
-	//if (drag_start_point_ == drag_end_point_)
-	//	return;
+	if (drag_start_point_ == drag_end_point_)
+		return;
 
 	//int begin_index = get_point_line_index(drag_start_point_);
 	//int end_index = get_point_line_index(drag_end_point_);
 	//if (begin_index > end_index)
 	//	swap(begin_index, end_index);
-	//c_point start_point = get_point_spin_xy(drag_start_point_);
-	//c_point end_point = get_point_spin_xy(drag_end_point_);
-	//spin_point = end_point;
+	c_point start_point = get_point_spin_xy(drag_start_point_);
+	c_point end_point = get_point_spin_xy(drag_end_point_);
 
-	//if (start_point.y > end_point.y)
-	//	swap(start_point, end_point);
+	int begin_index = start_point.y;
+	int end_index = end_point.y;
 
-	//if (begin_index == end_index)
-	//	_gdi.fill_rect(start_point, { end_point.x,end_point.y + _font_height + line_off }, RGB(0, 144, 244));
-	//else {
-	//	for (int index = begin_index; index <= end_index; index++) {
-	//		if (index == end_index)
-	//			_gdi.fill_rect(start_point, { end_point.x,start_point.y + _font_height + line_off }, RGB(0, 144, 244));
-	//		else {
-	//			int end_x = get_text_end_x(get_index_line_text(index));
-	//			_gdi.fill_rect(start_point, { end_x,start_point.y + _font_height + line_off }, RGB(0, 144, 244));
-	//		}
-	//		start_point.x = off_margin_.x;
-	//		start_point.y += _font_height + line_off;
-	//	}
-	//}
+	start_point = get_spin_real_point(start_point);
+	end_point = get_spin_real_point(end_point);
+	spin_point = end_point;
+
+	if (start_point.y > end_point.y)
+		swap(start_point, end_point);
+
+	if (begin_index == end_index)
+		_gdi.fill_rect(start_point, { end_point.x,end_point.y + _font_height + line_off }, RGB(0, 144, 244));
+	else {
+		for (int index = begin_index; index <= end_index; index++) {
+			if (index == end_index)
+				_gdi.fill_rect(start_point, { end_point.x,start_point.y + line_height_ }, RGB(0, 144, 244));
+			else {
+				int end_x = get_line_width(index)*_font_width;// (get_index_line_text(index));
+				_gdi.fill_rect(start_point, { end_x,start_point.y + line_height_ }, RGB(0, 144, 244));
+			}
+			start_point.x = off_margin_.x;
+			start_point.y += line_height_;
+		}
+	}
 }
 
 void cedit::click_in(c_point p) {
@@ -597,10 +618,9 @@ void cedit::test() {
 		}
 		
 		_gdi.draw_line(old_spin_point, { old_spin_point.x , old_spin_point.y+line_height_ }, 1, _bk_color);
-		auto point = get_spin_real_point();
+		auto point = get_spin_real_point(spin_point);
 		_gdi.draw_line(point, { point.x ,point.y+line_height_ }, 1, rgb);
 		old_spin_point = point;
-		
 	}
 	update_parent();
 }
@@ -757,27 +777,6 @@ c_point cedit::get_point_spin_xy(c_point p) {
 	return { x,y };
 }
 
-//uint16_t cedit::get_text_end_x(string &text) {
-//	return text.size()*_font_width + off_margin_.x;
-//}
-//
-//uint16_t cedit::get_end_line_y() {
-//	return (v_text_.size() - start_line_)*(_font_height + line_off) + line_off + off_margin_.y;
-//}
-
-//uint16_t cedit::get_point_line_index(c_point p) {
-//	uint16_t index = start_line_ + (p.y - off_margin_.y) / (_font_height + line_off);
-//	if (index > v_text_.size() - 1)
-//		return v_text_.size() - 1;
-//	return index;
-//}
-
-//string &cedit::get_point_line_text(c_point p) {
-//	uint16_t index = get_point_line_index(p);
-//	if (index > v_text_.size() - 1)
-//		index = v_text_.size() - 1;
-//	return v_text_[index];
-//}
 
 string &cedit::get_index_line_text(uint16_t index) {
 	if (index < 0)
@@ -833,6 +832,7 @@ int cedit::get_spin_ch_pos() {
 	return start;
 }
 
+/*get the index of spin in the text*/
 int cedit::get_spin_ch_pos_in_text() {
 	vector<string> v_str;
 	string &text = get_index_line_text(spin_point.y);
@@ -921,7 +921,7 @@ void cedit::drag(c_point p) {
 }
 
 void cedit::mouse_move(c_point p) {
-	//drag_end_point_ = p;
+	drag_end_point_ = p;
 }
 
 void cedit::select_all() {
@@ -936,6 +936,7 @@ uint16_t cedit::get_max_line() {
 
 void cedit::change_font_height(int height) {
 	set_font_height(height);
+	line_height_ = height + line_off;
 	//max_line_ = get_max_line();
 }
 
@@ -952,10 +953,24 @@ void cedit::change_start_line(int move) {
 	start_line_ = t_new_line;
 }
 
+int cedit::get_line_width(int line) {
+	vector<string> v_str;
+	string &text = get_index_line_text(line);
+	split_with_ch(text, '\t', v_str);
+	int start = 0;
+	for (auto &s : v_str) {
+		if (s == "\t") 
+			start += TAB_WIDTH;
+		else
+			start += s.size();
+	}
+	return start;
+}
+
 void cedit::spin_up_end() {
 	if (spin_point.y >= 0) {
 		spin_point.y -= 1;
-		spin_point.x = v_text_[spin_point.y].size();
+		spin_point.x = get_line_width(spin_point.y);// v_text_[spin_point.y].size();
 	}
 }
 
@@ -968,21 +983,23 @@ void cedit::spin_down_begin() {
 
 void cedit::spin_left(int step /*= 1*/) {
 	if (spin_point.x > 0)
-		spin_point.x--;
+		spin_point.x -= get_next_spin_step_x(true);
 	else
 		spin_up_end();
+	is_spin = true;
 }
 
 void cedit::spin_right(int step /*= 1*/) {
-	if (spin_point.x < v_text_[spin_point.y].size())
-		spin_point.x+=step;
+	if (spin_point.x < get_line_width(spin_point.y))
+		spin_point.x += get_next_spin_step_x();
 	else
 		spin_down_begin();
+	is_spin = true;
 }
 
-c_point cedit::get_spin_real_point() {
-	int x = spin_point.x*_font_width + off_margin_.x;
-	int y = (spin_point.y - (long)start_line_)*line_height_ + off_margin_.y;
+c_point cedit::get_spin_real_point(c_point p) {
+	int x = p.x*_font_width + off_margin_.x;
+	int y = (p.y - (long)start_line_)*line_height_ + off_margin_.y;
 	return { x,y };
 }
 
@@ -990,7 +1007,8 @@ void cedit::spin_up(int step /*= 1*/) {
 	if (is_spin_top_line())
 		change_start_line(-1);
 	if (spin_point.y > 0)
-		spin_point.y--;
+		spin_point.y -= step;
+	is_spin = true;
 }
 
 void cedit::spin_down(int step /*= 1*/) {
@@ -998,12 +1016,34 @@ void cedit::spin_down(int step /*= 1*/) {
 		spin_point.y += step;
 	if (is_spin_bottom_line())
 		change_start_line(1);
+	is_spin = true;
 }
 
 bool cedit::is_spin_top_line() {
 	if (start_line_ == spin_point.y)
 		return true;
 	return false;
+}
+
+int cedit::get_next_spin_step_x(bool is_left) {
+	vector<string> v_str;
+	string &text = get_index_line_text(spin_point.y);
+	split_with_ch(text, '\t', v_str);
+	int start = 0;
+	int next = is_left > 0 ? spin_point.x - 1 : spin_point.x + 1;
+	for (auto &s : v_str) {
+		if (s == "\t") {
+			start += TAB_WIDTH;
+			if (start > next)
+				return TAB_WIDTH;
+		}
+		else {
+			start += s.size();
+			if (start >= next)
+				return 1;
+		}
+	}
+	return 0;
 }
 
 bool cedit::is_spin_bottom_line() {

@@ -63,9 +63,11 @@ public:
 	void spin_right(int step = 1);
 	void spin_up(int step = 1);
 	void spin_down(int step = 1);
+	int get_next_spin_step_x(bool is_left = false);
+	int get_line_width(int line);
 	bool is_spin_bottom_line();
 	bool is_spin_top_line();
-	c_point get_spin_real_point();
+	c_point get_spin_real_point(c_point p);
 	string get_spin_ch();
 	string get_GB(string &str,int index);
 private:
