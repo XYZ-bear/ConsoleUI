@@ -30,23 +30,23 @@ void cscroll::click_in(c_point p) {
 		else if (old_point_.y > scroll_bar_.p.y + scroll_bar_.height)
 			scroll_to_(scroll_bar_.p.y + _height * one_step_);
 	}
-	else if (style_ == T_v_scroll)
-		scroll_bar_ = { { scroll_bar_offset,scroll_bar_offset },70,_height - 2 * scroll_bar_offset };
+	else if (style_ == T_v_scroll) {
+		if (old_point_.x < scroll_bar_.p.x)
+			scroll_to_(scroll_bar_.p.x - _width * one_step_);
+		else if (old_point_.x > scroll_bar_.p.x + scroll_bar_.width)
+			scroll_to_(scroll_bar_.p.x + _width * one_step_);
+	}
 	update();
-	//if(scroll_bar_.is_point_in(old_point_))
-	//ctimer::instance().add_timer(this, 500, &cscroll::test);
 }
 
 void cscroll::click_out(c_point p) {
-	//ctimer::instance().kill_timer(this, &cscroll::test);
 }
 
 bool cscroll::init() {
-	//ctimer::instance().add_timer(this, 500, &cscroll::test);
 	if (style_ == T_h_scroll)
-		scroll_bar_ = { { scroll_bar_offset,scroll_bar_offset },_width - 2 * scroll_bar_offset,70 };
+		scroll_bar_ = { { scroll_bar_offset,scroll_bar_offset },_width - 2 * scroll_bar_offset,scroll_bar_.height };
 	else if (style_ == T_v_scroll)
-		scroll_bar_ = { { scroll_bar_offset,scroll_bar_offset },70,_height - 2 * scroll_bar_offset };
+		scroll_bar_ = { { scroll_bar_offset,scroll_bar_offset },scroll_bar_.width,_height - 2 * scroll_bar_offset };
 	bar_active_color_ = bar_color_;
 	return cwbase::init();
 }
@@ -72,7 +72,7 @@ void cscroll::drag(c_point p) {
 		scroll_to_(scroll_bar_.p.y + (p.y));
 	}
 	else if (style_ == T_v_scroll) {
-		scroll_to_(scroll_bar_.p.x + (p.x - old_point_.x));
+		scroll_to_(scroll_bar_.p.x + p.x);
 	}
 	old_point_ = p;
 	update();
@@ -93,7 +93,6 @@ void cscroll::mouse_wheeled(bool up) {
 }
 
 void cscroll::scroll_to_(int xy) {
-	int move = 0;
 	if (style_ == T_h_scroll) {
 		int old_y = scroll_bar_.p.y;
 		int res_y_bottom = xy + scroll_bar_.height;
@@ -103,7 +102,6 @@ void cscroll::scroll_to_(int xy) {
 			scroll_bar_.p.y = _height - scroll_bar_offset - scroll_bar_.height;
 		else
 			scroll_bar_.p.y = xy;
-		move = scroll_bar_.p.y - old_y;
 	}
 	else if (style_ == T_v_scroll) {
 		int res_y_right = xy + scroll_bar_.width;
@@ -111,10 +109,20 @@ void cscroll::scroll_to_(int xy) {
 			return;
 		scroll_bar_.p.x = xy;
 	}
-	call_func_(T_scroll_event, &move);
+	scroll_info info{ min_pos_,max_pos_,(scroll_bar_.p.y- scroll_bar_offset )*max_pos_ / (_height - 2 * scroll_bar_offset) };
+	call_func_(T_scroll_event, &info);
 }
 
 void cscroll::scroll(int xy) {
 	scroll_to_(scroll_bar_.p.y + xy);
 	update();
+}
+
+void cscroll::set_range(int min, int max) { 
+	min_pos_ = min;
+	max_pos_ = max;
+	if (style_ == T_h_scroll)
+		scroll_bar_.height = (_height - 2 * scroll_bar_offset) * (_height - 2 * scroll_bar_offset) / (max - min);
+	else
+		scroll_bar_.width = (_width - 2 * scroll_bar_offset) * (_width - 2 * scroll_bar_offset) / (max - min);
 }

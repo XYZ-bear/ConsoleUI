@@ -114,3 +114,10 @@ struct spin_info
 	char pre_ch = 0;
 	char next_ch = 0;
 };
+
+struct scroll_info
+{
+	int min = 0;
+	int max = 100;
+	int pos = 0;
+};

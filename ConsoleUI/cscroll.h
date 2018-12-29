@@ -27,7 +27,7 @@ public:
 	void set_one_step(float step) { one_step_ = step; };
 	/*move distance*/
 	void scroll(int xy);
-	void set_range(int min, int max) { min_pos_ = min; max_pos_ = max; };
+	void set_range(int min, int max);
 private:
 	void scroll_to_(int xy);
 private:

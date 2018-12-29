@@ -84,6 +84,7 @@ private:
 	string text_;
 	T_edit_style style_= T_singleline_edit;
 	cscroll *scroll_ = nullptr;
+	cscroll *v_scroll_ = nullptr;
 	vector<string> v_text_;
 	uint32_t start_line_ = 0;
 	uint16_t max_line_;

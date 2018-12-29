@@ -77,13 +77,13 @@ public:
 						data = { p.x ,p.y };
 						root_point = data;
 						active_ctr = get_point_ctr(this, data);
-						do_somthing(active_ctr, T_mouse_move_event, data);
-
+						
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
 							do_somthing(old_move_ctr, T_drag_event, root_point - old_root_point);
 							old_root_point = root_point;
 							goto update;
 						}
+						do_somthing(active_ctr, T_mouse_move_event, data);
 
 						if (old_move_ctr != active_ctr) {
 							do_somthing(active_ctr, T_mouse_move_in_event, data);
@@ -117,7 +117,6 @@ public:
 					}
 					else if (keyRec.Event.MouseEvent.dwButtonState == 0) {
 						if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
-							OutputDebugString("release ");
 						}
 
 					}
