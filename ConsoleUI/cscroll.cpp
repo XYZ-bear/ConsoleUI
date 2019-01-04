@@ -104,17 +104,27 @@ void cscroll::scroll_to_(int xy) {
 			scroll_bar_.p.y = xy;
 	}
 	else if (style_ == T_v_scroll) {
-		int res_y_right = xy + scroll_bar_.width;
-		if (xy<scroll_bar_offset || res_y_right>_width - scroll_bar_offset)
-			return;
-		scroll_bar_.p.x = xy;
+		int old_x = scroll_bar_.p.x;
+		int res_x_right = xy + scroll_bar_.width;
+		if (xy < scroll_bar_offset)
+			scroll_bar_.p.x = scroll_bar_offset;
+		else if (res_x_right > _width - scroll_bar_offset)
+			scroll_bar_.p.x = _width - scroll_bar_offset - scroll_bar_.width;
+		else
+			scroll_bar_.p.x = xy;
 	}
 	scroll_info info{ min_pos_,max_pos_,(scroll_bar_.p.y- scroll_bar_offset )*max_pos_ / (_height - 2 * scroll_bar_offset) };
 	call_func_(T_scroll_event, &info);
 }
 
 void cscroll::scroll(int xy) {
-	scroll_to_(scroll_bar_.p.y + xy);
+	if (style_ == T_h_scroll) {
+		scroll_to_(scroll_bar_.p.y + xy);
+	}
+	else if (style_ == T_v_scroll) {
+		scroll_to_(scroll_bar_.p.x + xy);
+	}
+	
 	update();
 }
 

@@ -31,9 +31,13 @@ bool cedit::update(bool redraw)
 		if (v_text_.size() - start_line_ < max_line_)
 			len = v_text_.size() - start_line_;
 
+		text_rect_.p.x = off_margin_.x;
+		if (old_spin_point.x > text_rect_.width)
+			text_rect_.p.x += text_rect_.width - old_spin_point.x;
 		for (int i = start_line_; i < len; i++) {
 			draw_line(i);
 		}
+		//old_spin_point = spin_point;
 	}
 
 	return cwbase::update(redraw);
@@ -41,27 +45,10 @@ bool cedit::update(bool redraw)
 
 void cedit::draw_line(int line) {
 	int ypos = (line-start_line_)*line_height_;
-	int xpos = off_margin_.x;
-
-
-	//if (drag_start_point_ != drag_end_point_) {
-	//	c_point start_point = get_point_spin_xy(drag_start_point_);
-	//	c_point end_point = get_point_spin_xy(drag_end_point_);
-	//	spin_point = end_point;
-	//	start_point = get_spin_real_point(start_point);
-	//	end_point = get_spin_real_point(end_point);
-	//	if (start_point.y > end_point.y)
-	//		swap(start_point, end_point);
-	//	if(line== spin_point.y)
-	//		_gdi.fill_rect(start_point, { end_point.x,end_point.y + line_height_ }, RGB(0, 144, 244));
-	//}
-	
-
-	if (spin_point.x > text_rect_.width)
-		xpos += text_rect_.width - spin_point.x;
 	if (line == spin_point.y)
 		_gdi.draw_frame_rect({ text_rect_.p.x ,ypos }, { text_rect_.p.x + text_rect_.width,ypos + line_height_ }, 2, RGB(70, 70, 70));
-	_gdi.draw_text_ex(v_text_[line], { xpos,ypos }, _font_height);
+	_gdi.draw_text_ex(v_text_[line], { text_rect_.p.x,ypos }, _font_height);
+	old_spin_point = spin_point;
 }
 
 void cedit::draw_select() {
@@ -125,6 +112,7 @@ bool cedit::init() {
 		_font_height = _height - 4;
 	}
 
+	int max_line_x = 0;
 	ifstream myfile("cedit.cpp");
 	string temp;
 	myfile.is_open();
@@ -132,18 +120,20 @@ bool cedit::init() {
 	{
 		//parase_tab(temp);
 		v_text_.push_back(temp);
+		if (temp.length() > max_line_x)
+			max_line_x = temp.length();
 	}
 	myfile.close();
 
 	line_height_ = _font_height + line_off;
 	
 	scroll_ = new cscroll();
-	scroll_->create({ _width - 12,0 }, 12, _height, this);
+	scroll_->create({ _width - 12,0 }, 12, _height -12, this);
 	scroll_->set_bk_color(RGB(62, 62, 62));
 	scroll_->set_bar_color(RGB(104, 104, 104));
 	scroll_->set_bar_drag_color(RGB(200, 200, 200));
 	scroll_->set_range(0, v_text_.size()*line_height_);
-	scroll_->add_cmd(this, T_scroll_event, &cedit::on_scroll);
+	scroll_->add_cmd(this, T_scroll_event, &cedit::on_h_scroll);
 
 	v_scroll_ = new cscroll();
 	v_scroll_->create({ 0 ,_height - 12 }, _width, 12, this);
@@ -151,8 +141,8 @@ bool cedit::init() {
 	v_scroll_->set_bk_color(RGB(62, 62, 62));
 	v_scroll_->set_bar_color(RGB(104, 104, 104));
 	v_scroll_->set_bar_drag_color(RGB(200, 200, 200));
-	v_scroll_->set_range(0, 1000);
-	//v_scroll_->add_cmd(this, T_scroll_event, &cedit::on_scroll);
+	v_scroll_->set_range(0, max_line_x*_font_width);
+	v_scroll_->add_cmd(this, T_scroll_event, &cedit::on_v_scroll);
 
 
 	text_rect_ = { off_margin_,_width - scroll_->get_width(),_height-v_scroll_->get_height() };
@@ -271,9 +261,6 @@ void cedit::scroll_x(int dis) {
 }
 
 void cedit::scroll_y(int dis) {
-	scroll_xy.y += dis;
-	if (scroll_xy.y >= 0)
-		scroll_xy.y = 0;
 	if (start_line_ != 0) {
 		drag_end_point_.y += dis;
 		drag_start_point_.y += dis;
@@ -281,30 +268,33 @@ void cedit::scroll_y(int dis) {
 	change_start_line((-dis) / (line_height_));
 }
 
-void cedit::on_scroll(const void *data) {
+void cedit::on_h_scroll(const void *data) {
 	scroll_info &info = *(scroll_info*)data;
-	start_line_ = info.pos / line_height_;
+	change_start_line(info.pos / line_height_ - start_line_);
+	update();
+}
+
+void cedit::on_v_scroll(const void *data) {
+	scroll_info &info = *(scroll_info*)data;
+	
+	//start_line_ = info.pos / line_height_;
 	//change_start_line();
 	//scroll_xy.y += (-move/line_height_);
-	update();
+	//update();
 }
 
 void cedit::mouse_wheeled(bool up) {
 	if (up) {
-		scroll_->scroll(-(scroll_->get_height()*(_font_height + line_off) / _height));
-		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000))
+		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000)) 
 			change_font_height(get_font_size() + 2);
 		else
-			scroll_y(_font_height + line_off);
-		//scroll_xy.y += (_font_height + line_off);
+			scroll_->scroll(-1);
 	}
 	else {
-		scroll_->scroll(scroll_->get_height()*(_font_height + line_off) / _height);
 		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000))
 			change_font_height(get_font_size() - 2);
 		else
-			scroll_y(-(_font_height + line_off));
-		//scroll_xy.y -= _font_height + line_off;
+			scroll_->scroll(1);
 	}
 	update();
 }
@@ -447,13 +437,15 @@ void cedit::select_all() {
 }
 
 uint16_t cedit::get_max_line() {
-	return _height / (_font_height + line_off);
+	return text_rect_.height / line_height_;
 }
 
 void cedit::change_font_height(int height) {
 	set_font_height(height);
 	line_height_ = height + line_off;
-	//max_line_ = get_max_line();
+	max_line_ = get_max_line();
+	scroll_->set_range(0, v_text_.size()*line_height_);
+	scroll_->update();
 }
 
 void cedit::change_start_line(int move) {
@@ -493,7 +485,7 @@ void cedit::spin_up_end() {
 void cedit::spin_down_begin() {
 	if (spin_point.y < v_text_.size()) {
 		spin_point.y += 1;
-		spin_point.x = 0;
+		spin_point.x = text_rect_.p.x;
 	}
 }
 
@@ -514,7 +506,7 @@ void cedit::spin_right(int step /*= 1*/) {
 }
 
 c_point cedit::get_spin_real_point(c_point p) {
-	int x = p.x*_font_width + off_margin_.x;
+	int x = p.x*_font_width + text_rect_.p.x;
 	int y = (p.y - (long)start_line_)*line_height_ + off_margin_.y;
 	return { x,y };
 }

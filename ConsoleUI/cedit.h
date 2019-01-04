@@ -29,7 +29,8 @@ public:
 	void set_spin_color(COLORREF color) { spin_color_ = color; };
 	T_edit_style get_style() { return style_; };
 
-	void on_scroll(const void *data);
+	void on_h_scroll(const void *data);
+	void on_v_scroll(const void *data);
 	void draw_line(int line);
 	void parase_text(string &text);
 	void parase_tab(string &text);
