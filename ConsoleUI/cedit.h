@@ -45,6 +45,7 @@ public:
 	int get_spin_ch_pos_in_text();
 	void delete_ch();
 	void delete_select();
+	void add_new_line();
 	//void set_spin_x(int p);
 	//void set_spin_y(int p);
 	void scroll_x(int dis);

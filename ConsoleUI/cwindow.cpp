@@ -168,14 +168,14 @@ void cwindow::hint(c_point p) {
 	hint_point = p;
 }
 
-void cwindow::drag(c_point p) {
+void cwindow::drag(drag_info p) {
 	//if (p > c_point{ 0,0 }&&p < c_point{ get_console_width(),get_console_height() }) {
 		if (is_mouse_in_header) {
-			set_point(p + _left_top);
-			old_rect.p = p + _left_top;
+			set_point(p.move_dis + _left_top);
+			old_rect.p = p.move_dis + _left_top;
 			is_drag_ = true;
 			if (is_max_) {
-				set_size(p - c_point{(p.x*old_rect.width )/ get_console_width(),(p.y*old_rect.height) / get_console_height()}, old_rect.width, old_rect.height);
+				set_size(p.move_dis - c_point{(p.move_dis.x*old_rect.width )/ get_console_width(),(p.move_dis.y*old_rect.height) / get_console_height()}, old_rect.width, old_rect.height);
 				is_max_ = false;
 				//for (auto &child : chidren_list) {
 				//	int move = get_console_width() - _width;
@@ -188,13 +188,13 @@ void cwindow::drag(c_point p) {
 		old_rect.width = _width;
 		old_rect.height = _height;
 		if (hint_t_ == T_hint_right) {
-			set_size(_left_top, _width + p.x, _height);
+			set_size(_left_top, _width + p.move_dis.x, _height);
 		}
 		else if (hint_t_ == T_hint_bottom) {
-			set_size(_left_top, _width, _height + p.y);
+			set_size(_left_top, _width, _height + p.move_dis.y);
 		}
 		else if (hint_t_ == T_hint_right_bottom) {
-			set_size(_left_top, _width + p.x, _height + p.y);
+			set_size(_left_top, _width + p.move_dis.x, _height + p.move_dis.y);
 		}
 		size_change(old_rect);
 	}

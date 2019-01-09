@@ -42,7 +42,7 @@ bool cedit::update(bool redraw)
 
 void cedit::draw_line(int line) {
 	int ypos = (line-start_line_)*line_height_;
-	if (line == spin_point.y)
+	if (line == spin_point.y&&!is_select())
 		_gdi.draw_frame_rect({ text_rect_.p.x ,ypos }, { text_rect_.p.x + text_rect_.width,ypos + line_height_ }, 2, RGB(70, 70, 70));
 	_gdi.draw_text_ex(v_text_[line], { text_rect_.p.x,ypos }, _font_height);
 	old_spin_point = spin_point;
@@ -196,8 +196,14 @@ void cedit::input_key(c_key key) {
 	else if (key.wVirtualKeyCode == VK_DOWN) {
 		spin_down();
 	}
-	if (key.uChar.AsciiChar != 0) {
-		insert_ch(key.uChar.AsciiChar);
+	else if (key.wVirtualKeyCode == VK_RETURN) {
+		add_new_line();
+		goto update;
+	}
+	else {
+		if (key.uChar.AsciiChar != 0) {
+			insert_ch(key.uChar.AsciiChar);
+		}
 	}
 
 update:
@@ -277,7 +283,7 @@ string &cedit::get_end_line_text() {
 
 void cedit::insert_ch(char ch) {
 	string &text = get_line_text(spin_point.y);
-	text.insert(text.begin() + get_spin_ch_pos_in_text() + 1, ch);
+	text.insert(text.begin() + get_point_spin_info(spin_point,false).in_line_index, ch);
 	if (ch == '\t')
 		spin_right(TAB_WIDTH);
 	else
@@ -299,14 +305,11 @@ void cedit::delete_ch() {
 			spin_left(TAB_WIDTH);
 		else
 		    spin_left();
-		text.erase(text.begin() + info.in_line_index);
+		text.erase(text.begin() + info.in_line_index - 1);
 	}
 }
 
 void cedit::delete_select() {
-	if (drag_start_point_ == drag_end_point_)
-		return;
-
 	c_point start_point = drag_start_point_;
 	c_point end_point = drag_end_point_;
 
@@ -315,8 +318,6 @@ void cedit::delete_select() {
 
 	spin_info binfo = get_point_spin_info(start_point, false);
 	spin_info einfo = get_point_spin_info(end_point, false);
-	if (binfo.in_line_index > einfo.in_line_index)
-		swap(binfo, einfo);
 
 	if (start_point.y == end_point.y) {
 		string &text = v_text_[start_point.y];
@@ -328,11 +329,20 @@ void cedit::delete_select() {
 		string &etext = v_text_[end_point.y];
 		etext.erase(etext.begin(), etext.begin() + einfo.in_line_index);
 		btext += etext;
-		v_text_.erase(v_text_.begin() + start_point.y, v_text_.begin() + end_point.y);
+		v_text_.erase(v_text_.begin() + start_point.y + 1, v_text_.begin() + end_point.y + 1);
 	}
 	spin_point = start_point;
 	drag_end_point_ = spin_point;
 	drag_start_point_ = spin_point;
+}
+
+void cedit::add_new_line() {
+	spin_info binfo = get_point_spin_info(spin_point, false);
+	string &text=get_line_text(binfo.line);
+	string spit=text.substr(binfo.in_line_index, text.size() - binfo.in_line_index );
+	text.erase(text.begin()+binfo.in_line_index,text.end());
+	v_text_.insert(v_text_.begin() + binfo.line + 1, spit);
+	spin_down_begin();
 }
 
 int cedit::get_spin_ch_pos() {
@@ -355,33 +365,15 @@ int cedit::get_spin_ch_pos() {
 	return start;
 }
 
-/*get the index of spin in the text*/
-int cedit::get_spin_ch_pos_in_text() {
-	vector<string> v_str;
-	string &text = get_line_text(spin_point.y);
-	split_with_ch(text, '\t', v_str);
-	int start = 0;
-	int index = 0;
-	for (auto &s : v_str) {
-		if (s == "\t") {
-			start += TAB_WIDTH;
-			if (start >= spin_point.x)
-				return index;
-			index++;
-		}
-		else {
-			if (start+ s.size() >= spin_point.x)
-				return index + spin_point.x - start -1;
-			start += s.size();
-			index += s.size();
-		}
-	}
-	return index;
-}
-
 void cedit::drag(drag_info p) {
 	drag_end_point_= get_point_spin_xy(p.cur_point);
 	spin_point = drag_end_point_;
+	if (p.cur_point.y<text_rect_.p.y) {
+		scroll_->scroll(-1);
+	}
+	else if (p.cur_point.y > text_rect_.height) {
+		scroll_->scroll(1);
+	}
 	update();
 }
 
@@ -443,7 +435,7 @@ void cedit::spin_up_end() {
 void cedit::spin_down_begin() {
 	if (spin_point.y < v_text_.size()) {
 		spin_point.y += 1;
-		spin_point.x = text_rect_.p.x;
+		spin_point.x = 0;
 	}
 }
 

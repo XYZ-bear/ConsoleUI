@@ -86,7 +86,7 @@ public:
 	void mouse_move(c_point p);
 	void double_click(c_point p);
 	void hint(c_point p);
-	void drag(c_point p);
+	void drag(drag_info p);
 	void size_change(c_rect rect);
 	void input_key(c_key key);
 public:
