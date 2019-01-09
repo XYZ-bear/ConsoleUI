@@ -23,7 +23,8 @@ bool cedit::update(bool redraw)
 {
 	erase_bk();
 	_gdi.draw_frame_rect({ 0,0 }, { _width ,_height });
-	draw_select();
+	if (is_select())
+		draw_select();
 	if (style_ == T_singleline_edit)
 		_gdi.draw_text(text_, off_margin_, _font_height);
 	else {
@@ -31,13 +32,9 @@ bool cedit::update(bool redraw)
 		if (v_text_.size() - start_line_ < max_line_)
 			len = v_text_.size() - start_line_;
 
-		text_rect_.p.x = off_margin_.x;
-		if (old_spin_point.x > text_rect_.width)
-			text_rect_.p.x += text_rect_.width - old_spin_point.x;
 		for (int i = start_line_; i < len; i++) {
 			draw_line(i);
 		}
-		//old_spin_point = spin_point;
 	}
 
 	return cwbase::update(redraw);
@@ -52,57 +49,46 @@ void cedit::draw_line(int line) {
 }
 
 void cedit::draw_select() {
-	if (drag_start_point_ == drag_end_point_)
-		return;
-
-	//int begin_index = get_point_line_index(drag_start_point_);
-	//int end_index = get_point_line_index(drag_end_point_);
-	//if (begin_index > end_index)
-	//	swap(begin_index, end_index);
-	c_point start_point = get_point_spin_xy(drag_start_point_);
-	c_point end_point = get_point_spin_xy(drag_end_point_);
+	c_point start_point = drag_start_point_;
+	c_point end_point = drag_end_point_;
 
 	int begin_index = start_point.y;
 	int end_index = end_point.y;
 
 	start_point = get_spin_real_point(start_point);
 	end_point = get_spin_real_point(end_point);
-	spin_point = end_point;
 
 	if (start_point.y > end_point.y)
 		swap(start_point, end_point);
 
+	if (begin_index > end_index)
+		swap(begin_index, end_index);
+
 	if (begin_index == end_index)
-		_gdi.fill_rect(start_point, { end_point.x,end_point.y + _font_height + line_off }, RGB(0, 144, 244));
+		_gdi.fill_rect(start_point, { end_point.x,end_point.y + line_height_ }, RGB(0, 144, 244));
 	else {
 		for (int index = begin_index; index <= end_index; index++) {
 			if (index == end_index)
 				_gdi.fill_rect(start_point, { end_point.x,start_point.y + line_height_ }, RGB(0, 144, 244));
 			else {
-				int end_x = get_line_width(index)*_font_width;// (get_index_line_text(index));
-				_gdi.fill_rect(start_point, { end_x,start_point.y + line_height_ }, RGB(0, 144, 244));
+				int end_x = get_line_width(index)*_font_width;
+				_gdi.fill_rect(start_point, { end_x +text_rect_.p.x,start_point.y + line_height_ }, RGB(0, 144, 244));
 			}
-			start_point.x = off_margin_.x;
+			start_point.x = text_rect_.p.x;
 			start_point.y += line_height_;
 		}
 	}
 }
 
 void cedit::click_in(c_point p) {
-	//ctimer::instance().add_timer(this, 500, &cedit::test);
-
 	spin_point = get_point_spin_xy(p);
-
-	//OutputDebugString(to_string(get_spin_ch_pos_in_text()).c_str());
-
-	drag_start_point_ = p;
-	drag_end_point_ = p;
+	drag_start_point_ = spin_point;
+	drag_end_point_ = spin_point;
 	set_timer(this, 500, &cedit::test);
 	update();
 }
 
 void cedit::click_out(c_point p) {
-	//ctimer::instance().kill_timer(this, &cedit::test);
 	kill_timer(this, &cedit::test);
 	is_spin = false;
 }
@@ -118,7 +104,6 @@ bool cedit::init() {
 	myfile.is_open();
 	while (getline(myfile, temp))
 	{
-		//parase_tab(temp);
 		v_text_.push_back(temp);
 		if (temp.length() > max_line_x)
 			max_line_x = temp.length();
@@ -193,31 +178,22 @@ void cedit::input_key(c_key key) {
 		goto update;
 	}
 	if (key.wVirtualKeyCode == VK_BACK) {
-		delete_ch();
-		//if (text_.size() > 0) {
-		//	if ((*(text_.end()-1)) < 0) {   //ºº×ÖË«×Ö½Ú±àÂë
-		//		text_.pop_back();
-		//		spin_x_ -= _font_height / 2;
-		//	}
-		//	text_.pop_back();
-		//	spin_x_ -= _font_height / 2;
-		//} 
+		if (is_select())
+			delete_select();
+		else
+			delete_ch();
 		goto update;
 	}
 	else if (key.wVirtualKeyCode == VK_RIGHT) {
-		///set_spin_x(spin_point.x + _font_width);
 		spin_right();
 	}
 	else if (key.wVirtualKeyCode == VK_LEFT) {
-		///set_spin_x(spin_point.x - _font_width);
 		spin_left();
 	}
 	else if (key.wVirtualKeyCode == VK_UP) {
-		//spin_point.y -= (_font_height + line_off);
 		spin_up();
 	}
 	else if (key.wVirtualKeyCode == VK_DOWN) {
-		//spin_point.y += (_font_height + line_off);
 		spin_down();
 	}
 	if (key.uChar.AsciiChar != 0) {
@@ -228,59 +204,26 @@ update:
 	update();
 }
 
-void cedit::scroll_x(int dis) {
-	//if (dis < 0) {//spin
-	//	if (scroll_xy.x >= 0) { //to up line
-	//		int index = get_point_line_index(spin_point);
-	//		if (index == 0)     //first line
-	//			return;
-	//		int end_x = get_text_end_x(get_index_line_text(index - 1));
-	//		if (end_x > text_rect_.width) {  //up line over right
-	//			spin_point.x = get_point_spin_xy({ text_rect_.width,0 }).x;
-	//		}
-	//		else
-	//			spin_point.x = end_x;
-	//	}
-	//	else {
-	//		scroll_xy.x += _font_width;
-	//		drag_start_point_.x += _font_width;
-	//	}
-	//}
-	//else if (dis > _width) {
-	//	int end_x = get_text_end_x(get_point_line_text(spin_point));
-	//	if (text_rect_.width - scroll_xy.x > end_x) {
-	//		spin_point.x = off_margin_.x;
-	//	}
-	//	else {
-	//		scroll_xy.x -= _font_width;
-	//		drag_start_point_.x -= _font_width;
-	//	}
-	//}
-	//else
-	//	spin_point.x = dis;
-}
-
 void cedit::scroll_y(int dis) {
 	if (start_line_ != 0) {
-		drag_end_point_.y += dis;
-		drag_start_point_.y += dis;
+		drag_end_point_.y -= dis;
+		drag_start_point_.y -= dis;
 	}
-	change_start_line((-dis) / (line_height_));
+	change_start_line(dis/ line_height_);
 }
 
 void cedit::on_h_scroll(const void *data) {
 	scroll_info &info = *(scroll_info*)data;
 	change_start_line(info.pos / line_height_ - start_line_);
+	drag_end_point_.y += ((info.pos / line_height_ - start_line_)*line_height_);
+	drag_start_point_.y += ((info.pos / line_height_ - start_line_)*line_height_);
 	update();
 }
 
 void cedit::on_v_scroll(const void *data) {
 	scroll_info &info = *(scroll_info*)data;
-	
-	//start_line_ = info.pos / line_height_;
-	//change_start_line();
-	//scroll_xy.y += (-move/line_height_);
-	//update();
+	text_rect_.p.x -= info.move;
+	update();
 }
 
 void cedit::mouse_wheeled(bool up) {
@@ -315,29 +258,10 @@ void cedit::parase_text(string &text) {
 	}
 }
 
-void cedit::parase_tab(string &text) {
-	size_t pre_pos = 0;
-	size_t old_pos = -1;
-	while (1) {
-		pre_pos = text.find_first_of('\t', old_pos + 1);
-		if (pre_pos == -1) {
-			//v_text_.push_back(text.substr(old_pos + 1, text_.size() - old_pos - 1));
-			break;
-		}
-		else {
-			text.insert(text.begin() + pre_pos, ' ');
-			text.insert(text.begin() + pre_pos, ' ');
-			text.insert(text.begin() + pre_pos, ' ');
-			old_pos = pre_pos + 3;
-		}
-	}
-}
-
 c_point cedit::get_point_spin_xy(c_point p) {
 	spin_info info = get_point_spin_info(p);
 	return { info.in_line_pos,info.line };
 }
-
 
 string &cedit::get_line_text(uint16_t index) {
 	if (index < 0)
@@ -362,17 +286,53 @@ void cedit::insert_ch(char ch) {
 
 void cedit::delete_ch() {
 	string &text = get_line_text(spin_point.y);
-	if (spin_point.x == 0)
+	if (spin_point.x == 0) {
+		int line = spin_point.y;
 		spin_up_end();
+		if (text.size() != 0 && line >= 1)
+			get_line_text(line - 1) += text;
+		v_text_.erase(v_text_.begin() + line);
+	}
 	else {
 		spin_info info = get_point_spin_info(spin_point, false);
 		if (info.in_line_ch == '\t')
 			spin_left(TAB_WIDTH);
 		else
 		    spin_left();
-		
 		text.erase(text.begin() + info.in_line_index);
 	}
+}
+
+void cedit::delete_select() {
+	if (drag_start_point_ == drag_end_point_)
+		return;
+
+	c_point start_point = drag_start_point_;
+	c_point end_point = drag_end_point_;
+
+	if (start_point.y > end_point.y)
+		swap(start_point, end_point);
+
+	spin_info binfo = get_point_spin_info(start_point, false);
+	spin_info einfo = get_point_spin_info(end_point, false);
+	if (binfo.in_line_index > einfo.in_line_index)
+		swap(binfo, einfo);
+
+	if (start_point.y == end_point.y) {
+		string &text = v_text_[start_point.y];
+		text.erase(text.begin() + binfo.in_line_index, text.begin() + einfo.in_line_index);
+	}
+	else {
+		string &btext = v_text_[start_point.y];
+		btext.erase(btext.begin() + binfo.in_line_index, btext.end());
+		string &etext = v_text_[end_point.y];
+		etext.erase(etext.begin(), etext.begin() + einfo.in_line_index);
+		btext += etext;
+		v_text_.erase(v_text_.begin() + start_point.y, v_text_.begin() + end_point.y);
+	}
+	spin_point = start_point;
+	drag_end_point_ = spin_point;
+	drag_start_point_ = spin_point;
 }
 
 int cedit::get_spin_ch_pos() {
@@ -385,7 +345,6 @@ int cedit::get_spin_ch_pos() {
 			start += TAB_WIDTH;
 			if (start >= spin_point.x)
 				return start;
-			
 		}
 		else {
 			start += s.size();
@@ -411,7 +370,6 @@ int cedit::get_spin_ch_pos_in_text() {
 			index++;
 		}
 		else {
-			
 			if (start+ s.size() >= spin_point.x)
 				return index + spin_point.x - start -1;
 			start += s.size();
@@ -421,18 +379,18 @@ int cedit::get_spin_ch_pos_in_text() {
 	return index;
 }
 
-void cedit::drag(c_point p) {
-	drag_end_point_= drag_end_point_ + p;
+void cedit::drag(drag_info p) {
+	drag_end_point_= get_point_spin_xy(p.cur_point);
+	spin_point = drag_end_point_;
 	update();
 }
 
 void cedit::mouse_move(c_point p) {
-	//drag_end_point_ = p;
 }
 
 void cedit::select_all() {
 	drag_start_point_ = { 0,0 };
-	drag_end_point_ = { _width,_height };
+	drag_end_point_ = { get_line_width(v_text_.size() - 1),(int)v_text_.size() - 1 };
 	update();
 }
 
@@ -478,7 +436,7 @@ int cedit::get_line_width(int line) {
 void cedit::spin_up_end() {
 	if (spin_point.y >= 0) {
 		spin_point.y -= 1;
-		spin_point.x = get_line_width(spin_point.y);// v_text_[spin_point.y].size();
+		spin_point.x = get_line_width(spin_point.y);
 	}
 }
 
@@ -531,6 +489,10 @@ bool cedit::is_spin_top_line() {
 	if (start_line_ == spin_point.y)
 		return true;
 	return false;
+}
+
+bool cedit::is_select() {
+	return drag_start_point_ != drag_end_point_;
 }
 
 int cedit::get_next_spin_step_x(bool is_left) {
@@ -595,26 +557,29 @@ spin_info cedit::get_point_spin_info(c_point p, bool is_screen_point) {
 	
 	for (auto &s : v_str) {
 		if (s == "\t") {
-			start += TAB_WIDTH;
-			if (start >= x) {
+			
+			if (start+ TAB_WIDTH > x) {
 				info.in_line_pos = start;
 				info.in_line_index = index;
-				info.in_line_ch = text[info.in_line_index];
+				if (info.in_line_index >= 0)
+					info.in_line_ch = text[info.in_line_index];
 				if (info.in_line_index >= 1)
 					info.pre_ch = text[info.in_line_index - 1];
-				info.pre_ch = text[info.in_line_index + 1];
+				//info.pre_ch = text[info.in_line_index + 1];
 				return info;
 			}
+			start += TAB_WIDTH;
 			index++;
 		}
 		else {
 			if (start + s.size() >= x) {
-				info.in_line_index = index + x - start - 1;
+				info.in_line_index = index + x - start;
 				info.in_line_pos = x;
-				info.in_line_ch = text[info.in_line_index];
+				if (info.in_line_index >= 0)
+					info.in_line_ch = text[info.in_line_index];
 				if (info.in_line_index >= 1)
 					info.pre_ch = text[info.in_line_index - 1];
-				info.pre_ch = text[info.in_line_index + 1];
+				//info.pre_ch = text[info.in_line_index + 1];
 				return info;
 			}
 			start += s.size();

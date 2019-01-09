@@ -79,7 +79,8 @@ public:
 						active_ctr = get_point_ctr(this, data);
 						
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
-							do_somthing(old_move_ctr, T_drag_event, root_point - old_root_point);
+							drag_info di{ data,root_point - old_root_point };
+							do_somthing(old_move_ctr, T_drag_event, di);
 							old_root_point = root_point;
 							goto update;
 						}
@@ -223,6 +224,12 @@ public:
 		if (!ctr)
 			return false;
 		ctr->set_is_focus(data);
+		ctr->do_event(id, &data);
+	}
+
+	bool do_somthing(cwbase* ctr, T_ctr_event id, drag_info &data) {
+		if (!ctr)
+			return false;
 		ctr->do_event(id, &data);
 	}
 

@@ -122,7 +122,7 @@ public:
 	virtual void mouse_wheeled(bool up) {};
 	virtual void input_key(c_key key) { };
 	virtual void focus() { };
-	virtual void drag(c_point p) { };
+	virtual void drag(drag_info p) { };
 	virtual bool pre_event(T_ctr_event id, const void *data) { return true; };
 };
 

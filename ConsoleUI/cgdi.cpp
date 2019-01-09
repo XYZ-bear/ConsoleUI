@@ -132,7 +132,7 @@ void cgdi::draw_text_ex(string &str, c_point p, int height, COLORREF color) {
 
 	for (auto &s : v_str) {
 		if (s == "\t") {
-			rect.left = rect.right + 3 * height / 2;
+			rect.left = rect.right + TAB_WIDTH * height / 2;
 			rect.right = rect.left;
 		}
 		else {

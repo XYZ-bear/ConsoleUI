@@ -189,7 +189,7 @@ void cwbase::do_event(T_ctr_event id, const void *data) {
 		break;
 	case T_focus:focus();
 		break;
-	case T_drag_event:drag(*(c_point*)data);
+	case T_drag_event:drag(*(drag_info*)data);
 		break;
 	case T_scroll_event:
 		break;

@@ -6,6 +6,7 @@
 
 /*default init*/
 #define D_default_font_height 16       //width=height/2
+#define TAB_WIDTH 3
 
 /*event define*/
 enum T_ctr_event {
@@ -57,8 +58,8 @@ typedef _KEY_EVENT_RECORD c_key;
 
 
 struct c_point {
-	long x;
-	long y;
+	long x = 0;
+	long y = 0;
 
 	bool operator==(const c_point p) const
 	{
@@ -66,7 +67,7 @@ struct c_point {
 	}
 	bool operator!=(const c_point p) const
 	{
-		return p.x != x && p.y != y;
+		return p.x != x || p.y != y;
 	}
 	void operator+=(const c_point p)
 	{
@@ -115,9 +116,16 @@ struct spin_info
 	char next_ch = 0;
 };
 
+/* cur_point:in the ctr | move_dis:x & y dirction move distence*/
+struct drag_info {
+	c_point cur_point;
+	c_point move_dis;
+};
+
 struct scroll_info
 {
 	int min = 0;
 	int max = 100;
 	int pos = 0;
+	int move = 0;
 };

@@ -9,8 +9,6 @@ enum T_edit_style
 	T_singleline_edit
 };
 
-#define TAB_WIDTH 3
-
 class cedit :
 	public cwbase
 {
@@ -33,7 +31,6 @@ public:
 	void on_v_scroll(const void *data);
 	void draw_line(int line);
 	void parase_text(string &text);
-	void parase_tab(string &text);
 	c_point get_point_spin_xy(c_point p);
 	//c_point get_end_line_spin_xy();
 	string &get_end_line_text();
@@ -47,6 +44,7 @@ public:
 	int get_spin_ch_pos();
 	int get_spin_ch_pos_in_text();
 	void delete_ch();
+	void delete_select();
 	//void set_spin_x(int p);
 	//void set_spin_y(int p);
 	void scroll_x(int dis);
@@ -68,8 +66,8 @@ public:
 	int get_line_width(int line);
 	bool is_spin_bottom_line();
 	bool is_spin_top_line();
+	bool is_select();
 	c_point get_spin_real_point(c_point p);
-	string get_spin_ch();
 	int get_point_line(int y);
 	int get_point_line_pos(int x);
 	spin_info get_point_spin_info(c_point p, bool is_screen_point = true);
@@ -103,7 +101,7 @@ public:
 	void mouse_move_out(c_point p);
 	void focus();
 	void mouse_wheeled(bool up);
-	void drag(c_point p);
+	void drag(drag_info p);
 	void mouse_move(c_point p);
 };
 
