@@ -58,6 +58,7 @@ bool cwindow::init() {
 	edit->set_font_height(16);
 	edit->create({ 60,50 }, 500, 300, this, RGB(30, 30, 30));
 	edit->set_style(T_multiline_edit);
+	edit->set_tip("¹Øsdddddddddddddddddddddddddddddddddddddddd±Õ");
 
 	//cscroll *scroll = new cscroll();
 	//scroll->create({ 310,30 }, 12, 200, this);

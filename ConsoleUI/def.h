@@ -40,7 +40,8 @@ enum T_ctr_type
 	T_button,
 	T_edit,
 	T_tips,
-	T_scroll
+	T_scroll,
+	T_message_box
 };
 
 /*align*/

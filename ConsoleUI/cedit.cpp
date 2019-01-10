@@ -210,14 +210,6 @@ update:
 	update();
 }
 
-void cedit::scroll_y(int dis) {
-	if (start_line_ != 0) {
-		drag_end_point_.y -= dis;
-		drag_start_point_.y -= dis;
-	}
-	change_start_line(dis/ line_height_);
-}
-
 void cedit::on_h_scroll(const void *data) {
 	scroll_info &info = *(scroll_info*)data;
 	change_start_line(info.pos / line_height_ - start_line_);
@@ -440,16 +432,24 @@ void cedit::spin_down_begin() {
 }
 
 void cedit::spin_left(int step /*= 1*/) {
-	if (spin_point.x > 0)
-		spin_point.x -= get_next_spin_step_x(true);
+	if (spin_point.x > 0) {
+		int t = get_next_spin_step_x(true);
+		if((spin_point.x - t)*_font_width + text_rect_.p.x < 0)
+			v_scroll_->scroll(-_font_width);
+		spin_point.x -= t;
+	}
 	else
 		spin_up_end();
 	is_spin = true;
 }
 
 void cedit::spin_right(int step /*= 1*/) {
-	if (spin_point.x < get_line_width(spin_point.y))
-		spin_point.x += get_next_spin_step_x();
+	if (spin_point.x < get_line_width(spin_point.y)) {
+		int t = get_next_spin_step_x();
+		if ((spin_point.x + t)*_font_width + text_rect_.p.x > text_rect_.width)
+			v_scroll_->scroll(_font_width);
+		spin_point.x += t;
+	}
 	else
 		spin_down_begin();
 	is_spin = true;
@@ -483,6 +483,12 @@ bool cedit::is_spin_top_line() {
 	return false;
 }
 
+bool cedit::is_spin_bottom_line() {
+	if (max_line_ == spin_point.y - start_line_)
+		return true;
+	return false;
+}
+
 bool cedit::is_select() {
 	return drag_start_point_ != drag_end_point_;
 }
@@ -506,12 +512,6 @@ int cedit::get_next_spin_step_x(bool is_left) {
 		}
 	}
 	return 0;
-}
-
-bool cedit::is_spin_bottom_line() {
-	if (max_line_ == spin_point.y - start_line_)
-		return true;
-	return false;
 }
 
 /*y->line*/
