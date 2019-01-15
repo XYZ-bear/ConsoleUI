@@ -56,6 +56,7 @@ enum T_align
 };
 
 typedef _KEY_EVENT_RECORD c_key;
+typedef COLORREF c_color;
 
 
 struct c_point {

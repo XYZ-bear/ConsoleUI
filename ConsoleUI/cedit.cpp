@@ -36,7 +36,7 @@ bool cedit::update(bool redraw)
 			draw_line(i);
 		}
 	}
-
+	
 	return cwbase::update(redraw);
 }
 
@@ -64,15 +64,20 @@ void cedit::draw_select() {
 	if (begin_index > end_index)
 		swap(begin_index, end_index);
 
+	//只显示可见区域
 	if (begin_index == end_index)
-		_gdi.fill_rect(start_point, { end_point.x,end_point.y + line_height_ }, RGB(0, 144, 244));
+		_gdi.fill_rect(start_point, { end_point.x,end_point.y + line_height_ }, select_color_);
 	else {
 		for (int index = begin_index; index <= end_index; index++) {
+			//if (index > start_line_ + max_line_)
+			//	break;
+			//if (index < start_line_)
+			//	continue;
 			if (index == end_index)
-				_gdi.fill_rect(start_point, { end_point.x,start_point.y + line_height_ }, RGB(0, 144, 244));
+				_gdi.fill_rect(start_point, { end_point.x,start_point.y + line_height_ }, select_color_);
 			else {
 				int end_x = get_line_width(index)*_font_width;
-				_gdi.fill_rect(start_point, { end_x +text_rect_.p.x,start_point.y + line_height_ }, RGB(0, 144, 244));
+				_gdi.fill_rect(start_point, { end_x +text_rect_.p.x,start_point.y + line_height_ }, select_color_);
 			}
 			start_point.x = text_rect_.p.x;
 			start_point.y += line_height_;
@@ -99,7 +104,7 @@ bool cedit::init() {
 	}
 
 	int max_line_x = 0;
-	ifstream myfile("cedit.cpp");
+	ifstream myfile("def.h");
 	string temp;
 	myfile.is_open();
 	while (getline(myfile, temp))
@@ -137,7 +142,35 @@ bool cedit::init() {
 }
 
 void cedit::double_click(c_point p) {
-
+	auto info = get_point_spin_info(p);
+	int prei = info.in_line_index;
+	int nexti = info.in_line_index;
+	string &text = v_text_[info.line];
+	int line_len = text.size();
+	while (1) {
+		if (text[prei] != ' '&&prei > 0)
+			prei--;
+		if (text[nexti] != ' '&&nexti < line_len )
+			nexti++;
+		if (prei == 0 && nexti == line_len)
+			break;
+		else if (text[prei] == ' '&&text[nexti] == ' ') {
+			prei++;
+			//nexti--;
+			break;
+		}
+		else if (prei == 0 && text[nexti] == ' ') {
+			//nexti--;
+			break;
+		}
+		else if (text[prei] == ' '&&nexti == line_len) {
+			prei++;
+			break;
+		}
+	}
+	drag_start_point_.x = index_to_pos(prei);
+	drag_end_point_.x = index_to_pos(nexti);
+	update();
 }
 
 void cedit::mouse_move_in(c_point p) {
@@ -357,6 +390,24 @@ int cedit::get_spin_ch_pos() {
 	return start;
 }
 
+/*get the real pos from the index*/
+int cedit::index_to_pos(int index) {
+	vector<string> v_str;
+	string &text = get_line_text(spin_point.y);
+	int start = 0;
+	int tindex = 0;
+	for (auto &s : text) {
+		if (index == tindex)
+			return start;
+		if (s == '\t')
+			start += TAB_WIDTH;
+		else
+			start += 1;
+		tindex++;
+	}
+	return start;
+}
+
 void cedit::drag(drag_info p) {
 	drag_end_point_= get_point_spin_xy(p.cur_point);
 	spin_point = drag_end_point_;
@@ -549,7 +600,6 @@ spin_info cedit::get_point_spin_info(c_point p, bool is_screen_point) {
 	
 	for (auto &s : v_str) {
 		if (s == "\t") {
-			
 			if (start+ TAB_WIDTH > x) {
 				info.in_line_pos = start;
 				info.in_line_index = index;
@@ -557,7 +607,6 @@ spin_info cedit::get_point_spin_info(c_point p, bool is_screen_point) {
 					info.in_line_ch = text[info.in_line_index];
 				if (info.in_line_index >= 1)
 					info.pre_ch = text[info.in_line_index - 1];
-				//info.pre_ch = text[info.in_line_index + 1];
 				return info;
 			}
 			start += TAB_WIDTH;

@@ -44,7 +44,9 @@ bool cwindow::init() {
 	close_button3->create({ _width - 65,5 }, 15, 15, this, RGB(255, 215, 0));
 	close_button3->set_type(T_circle_button);
 
-
+	cbutton *close_button4 = new cbutton();
+	close_button4->create({ 40,40 }, 15, 15, this, RGB(255, 215, 0));
+	close_button4->set_type(T_rect_button);
 	////cmenu *comb = new cmenu(this);
 	////comb->get_root().text = "com1";
 	////comb->get_root()[0].text = "root1";

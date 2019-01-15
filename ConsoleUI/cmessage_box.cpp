@@ -14,6 +14,7 @@ cmessage_box::~cmessage_box()
 
 bool cmessage_box::update(bool redraw)
 {
+	_gdi.draw_frame_rect({ 0,0 }, { _width ,_height });
 	return cwbase::update(redraw);
 }
 

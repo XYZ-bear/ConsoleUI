@@ -32,24 +32,13 @@ public:
 	void draw_line(int line);
 	void parase_text(string &text);
 	c_point get_point_spin_xy(c_point p);
-	//c_point get_end_line_spin_xy();
 	string &get_end_line_text();
-	//uint16_t get_point_line_index(c_point p);
-	//string &get_point_line_text(c_point p);
 	string &get_line_text(uint16_t index);
-	//string get_point_ch(c_point p);
-	//uint16_t get_text_end_x(string &text);
-	//uint16_t get_end_line_y();
-	void insert_ch(char ch);
 	int get_spin_ch_pos();
-	int get_spin_ch_pos_in_text();
+	void insert_ch(char ch);
 	void delete_ch();
 	void delete_select();
 	void add_new_line();
-	//void set_spin_x(int p);
-	//void set_spin_y(int p);
-	void scroll_x(int dis);
-	void scroll_y(int dis);
 
 	void draw_select();
 	void select_all();
@@ -65,6 +54,7 @@ public:
 	void spin_down(int step = 1);
 	int get_next_spin_step_x(bool is_left = false);
 	int get_line_width(int line);
+	int index_to_pos(int index);
 	bool is_spin_bottom_line();
 	bool is_spin_top_line();
 	bool is_select();
@@ -80,7 +70,8 @@ private:
 	int spin_x_off_;
 	int spin_y_off_;
 	c_point scroll_xy{ 0,0 };
-	COLORREF spin_color_ = RGB(255, 255, 255);
+	c_color spin_color_ = RGB(255, 255, 255);
+	c_color select_color_ = RGB(0, 144, 244);
 	string text_;
 	T_edit_style style_= T_singleline_edit;
 	cscroll *scroll_ = nullptr;
