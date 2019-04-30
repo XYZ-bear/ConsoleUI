@@ -1,6 +1,6 @@
-#pragma once  //sf	fsdf			dsd
+#pragma once 
 
-#include "cwindow.h"
+#include "test_window.h"
 #include <list>
 #include <thread>
 #include <iostream>
@@ -14,10 +14,10 @@ public:
 	~cframe();
 
 	bool init() {
-		cwindow *window=new cwindow();
+		testwindow *window=new testwindow();
 		window->create("windows1", { 10,20 }, 600, 400);
 
-		//cwindow *window2 = new cwindow();
+		//testwindow *window2 = new testwindow();
 		//window2->create("windows2", { 100,60 }, 300, 200);
 
 		//int k = 40;
@@ -55,7 +55,6 @@ public:
 		c_point old_root_point = { 0,0 };
 
 		while (1) {
-
 			INPUT_RECORD keyRec;
 			DWORD state = 0, res;
 			HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
@@ -63,7 +62,7 @@ public:
 			LPDWORD f=(LPDWORD)&num;
 			GetNumberOfConsoleInputEvents(hIn, f);
 			num = *f;
-
+			
 			if (num > 0) {
 				ReadConsoleInput(hIn, &keyRec, 1, &res);
 				erase_bk();
@@ -76,7 +75,14 @@ public:
 					if (keyRec.Event.MouseEvent.dwEventFlags == MOUSE_MOVED) {
 						data = { p.x ,p.y };
 						root_point = data;
-						active_ctr = get_point_ctr(this, data);
+				
+						auto res = get_point_ctr(this, data);
+						if (active_ctr->ctr_mode() == T_ctr_run_mode::T_single_mode) {
+							//if (!active_ctr->is_child(res))
+							//	goto update;
+						}
+						else
+							active_ctr = res;
 						
 						if (keyRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
 							drag_info di{ data,root_point - old_root_point };
@@ -104,7 +110,7 @@ public:
 						if (keyRec.Event.MouseEvent.dwEventFlags == 0) {
 							do_somthing(active_ctr, T_click_in_event, data);
 							do_somthing(active_ctr, T_focus, true);
-							tips.set_is_show(false);
+							tips.set_is_show(false); 
 							if (old_click_ctr != active_ctr)
 								do_somthing(old_click_ctr, T_click_out_event, data);
 							active_window = get_ctr_root_window(active_ctr);
@@ -137,8 +143,7 @@ public:
 				}
 
 				if (keyRec.EventType == KEY_EVENT) {
-					if (keyRec.Event.KeyEvent.bKeyDown)
-					{
+					if (keyRec.Event.KeyEvent.bKeyDown){
 						if(old_click_ctr)
 							old_click_ctr->do_event(T_input_key, &keyRec.Event.KeyEvent);
 					}
@@ -149,13 +154,14 @@ public:
 
 			update:
 			ctimer::instance().check_timer();
-			redraw_windows();
+			//redraw_windows();
+			update(false);
 			_gdi.update();
 		}
 	}
 
 	void input_event() {
-
+		
 	}
 
 	bool add(cwindow* window) {
@@ -177,7 +183,7 @@ public:
 
 	cwbase* get_point_ctr(cwbase *parent,c_point &p) {
 		if (parent) {
-			if (parent->is_point_in(p)) {
+			if (parent->is_point_in(p)&&parent->is_show()) {
 				p=parent->get_client_point(p);
 				auto &children = parent->get_children();
 				if (children.size() == 0) {
@@ -185,7 +191,6 @@ public:
 				}
 				else {
 					auto it = children.end();
-					
 					while (children.begin() != it) {
 						auto child = *(--it);
 						auto res=get_point_ctr(child, p);
@@ -253,6 +258,11 @@ public:
 				child->update_parent();
 		}
 	}
+
+	void set_active_ctr(cwbase *ctr) {
+		active_ctr = ctr;
+	}
+
 private:
 	list<cwindow*> window_list;
 	cwindow *active_window;

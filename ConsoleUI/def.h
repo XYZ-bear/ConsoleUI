@@ -44,6 +44,12 @@ enum T_ctr_type
 	T_message_box
 };
 
+/*run module*/
+enum T_ctr_run_mode {
+	T_single_mode,
+	T_common_mode
+};
+
 /*align*/
 enum T_align
 {

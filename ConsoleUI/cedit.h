@@ -16,7 +16,7 @@ public:
 	cedit();
 	~cedit();
 
-	bool update(bool redraw=false);
+	bool update(bool redraw=true);
 	bool init();
 	void click_in(c_point p);
 	void click_out(c_point p);

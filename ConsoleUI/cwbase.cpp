@@ -43,26 +43,77 @@ bool cwbase::init() {
 }
 
 bool cwbase::update(bool redraw) {
+	//if (_is_show) {
+	//	for (auto child : _childrend) {
+	//		if (child->is_show()) {
+	//			if (redraw)
+	//				child->update(redraw);
+	//			else
+	//				child->update_parent();
+	//		}
+	//	}
+	//	if (redraw) {
+	//		update_parent();
+	//	}
+	//	else {
+
+	//		auto parent = this;
+	//	
+	//		while (parent&&parent->get_ctr_type() != T_window) {
+	//			parent->update_parent();
+	//			parent = parent->_parent;
+	//		}
+	//	}
+	//}
+
 	if (_is_show) {
-		for (auto child : _childrend) {
-			if (redraw) {	
-				child->update(redraw);
-			}
-			else
-				child->update_parent();
-		}
 		if (redraw) {
+			//for (auto child : _childrend) {
+			//	if (child->is_show()) {
+			//		child->update(redraw);
+			//	}
+			//}
 			update_parent();
 		}
 		else {
-			auto parent = this;
-			while (parent&&parent->get_ctr_type() != T_window) {
-				parent->update_parent();
-				parent = parent->_parent;
+			for (auto child : _childrend) {
+				if (child->is_show()) {
+					//
+					child->update_parent();
+					//child->update(redraw);
+				}
 			}
 		}
 	}
 	return true;
+}
+
+void cwbase::to_top(cwbase *ctr) {
+	if (!ctr)
+		return;
+	auto parent = ctr->get_parent();
+	if (!parent)
+		return;
+	auto it = parent->_childrend.end();
+	while (parent->_childrend.begin() != it) {
+		auto child = *(--it);
+		if (ctr == child) {
+			parent->_childrend.erase(it);
+			parent->_childrend.push_back(ctr);
+			break;
+		}
+	}
+}
+
+bool cwbase::is_child(cwbase *ctr) {
+	if (!ctr)
+		return false;
+	if (ctr == this)
+		return true;
+	for (auto child : ctr->_childrend) {
+		child->is_child(ctr);
+	}
+	return false;
 }
 
 bool cwbase::create(c_point op, int width, int height, cwbase *parent, COLORREF bk_color) {
@@ -164,6 +215,15 @@ void cwbase::remove_child(cwbase *ctr) {
 			break;
 		}
 	}
+}
+
+cwbase *cwbase::get_root() {
+	auto ctr = this;
+	while (ctr&&ctr->get_ctr_type() != T_window) {
+		ctr->update_parent();
+		ctr = ctr->_parent;
+	}
+	return ctr;
 }
 
 void cwbase::do_event(T_ctr_event id, const void *data) {

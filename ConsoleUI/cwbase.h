@@ -33,7 +33,7 @@ protected:
 	cwbase *_parent = nullptr;
 	list<cwbase*> _childrend;
 	string _tip_str;
-
+	T_ctr_run_mode _ctr_mode = T_ctr_run_mode::T_common_mode;
 public:
 	cwbase();
 	virtual ~cwbase();
@@ -71,6 +71,9 @@ public:
 	void set_font_height(int height) { _font_height = height; _font_width = height / 2; }
 	int get_font_size() { return _font_height; }
 
+	void set_ctr_mode(T_ctr_run_mode mode) { _ctr_mode = mode; }
+	T_ctr_run_mode ctr_mode() { return _ctr_mode; }
+
 	c_point get_client_point(c_point p) {
 		return p - _left_top;
 	}
@@ -94,6 +97,8 @@ public:
 
 	cwbase *get_parent() { return _parent; }
 
+	cwbase *get_root();
+
 	list<cwbase*> &get_children() { return _childrend; }
 
 	void move_child_to_end(cwbase* ctr);
@@ -109,6 +114,10 @@ public:
 	void set_tip(string str) { _tip_str = str; }
 
 	string get_tip() { return _tip_str; }
+
+	void to_top(cwbase *ctr);
+
+	bool is_child(cwbase *ctr);
 public:
 	virtual bool init();
 	virtual bool update(bool redraw = false);
@@ -126,3 +135,4 @@ public:
 	virtual bool pre_event(T_ctr_event id, const void *data) { return true; };
 };
 
+    

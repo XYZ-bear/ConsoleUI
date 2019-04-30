@@ -8,6 +8,7 @@
 #include "ctimer.h"
 #include "cscroll.h"
 
+
 cwindow::cwindow()
 {
 	set_ctr_type(T_window);
@@ -16,17 +17,14 @@ cwindow::cwindow()
 
 cwindow::~cwindow()
 {
-	for (auto &child : chidren_list)
-		if (child)
-			delete child;
-	delete brigde_;
+
 }
 
 bool cwindow::init() {
 	is_mouse_in_header = false;
 	header_height = 30;
 
-	cbutton *close_button = new cbutton();;
+	cbutton *close_button = new cbutton();
 	close_button->create({ _width-25,5 }, 15, 15,this,RGB(144,0,0));
 	close_button->set_type(T_circle_button);
 	close_button->set_mouse_in_color(RGB(255, 0, 0));
@@ -43,37 +41,6 @@ bool cwindow::init() {
 	cbutton *close_button3 = new cbutton();
 	close_button3->create({ _width - 65,5 }, 15, 15, this, RGB(255, 215, 0));
 	close_button3->set_type(T_circle_button);
-
-	cbutton *close_button4 = new cbutton();
-	close_button4->create({ 40,40 }, 15, 15, this, RGB(255, 215, 0));
-	close_button4->set_type(T_rect_button);
-	////cmenu *comb = new cmenu(this);
-	////comb->get_root().text = "com1";
-	////comb->get_root()[0].text = "root1";
-	////comb->get_root()[1].text = "root2";
-	////comb->get_root()[2].text = "root3";
-	////comb->get_root()[3].text = "root4";
-	////comb->create({ 65,65 }, 70,90, this,RGB(255, 0, 0));
-	////add_child(comb);
-
-	cedit *edit = new cedit();
-	edit->set_font_height(16);
-	edit->create({ 60,50 }, 500, 300, this, RGB(30, 30, 30));
-	edit->set_style(T_multiline_edit);
-	edit->set_tip("¹Øsdddddddddddddddddddddddddddddddddddddddd±Õ");
-
-	//cscroll *scroll = new cscroll();
-	//scroll->create({ 310,30 }, 12, 200, this);
-	//scroll->set_bk_color(RGB(62,62,62));
-	//scroll->set_bar_color(RGB(104,104,104));
-	//scroll->set_bar_drag_color(RGB(200,200,200));
-	//scroll->set_tip("¹ö¹ö¶´");
-
-	//cscroll *scrollv = new cscroll();
-	//scrollv->create({ 100,300 }, 200, 12, this);
-	//scrollv->set_style(T_v_scroll);
-
-	//tips.create({ 0,0 }, 100, 20, this);
 
 	return cwbase::init();
 }
@@ -109,6 +76,16 @@ bool cwindow::create(string title, c_point op, int width, int height) {
 	pre_point = op;
 	old_rect = { op,width,height };
 	return cwbase::create(op,width,height, &cframe::instance());
+}
+
+bool cwindow::create(string title, c_point op, int width, int height, cwbase* parent) {
+	if (parent == nullptr)
+		return false;
+	title_ = title;
+	old_init_point = op;
+	pre_point = op;
+	old_rect = { op,width,height };
+	return cwbase::create(op, width, height, parent);
 }
 
 void cwindow::click_in(c_point p) {
@@ -201,8 +178,7 @@ void cwindow::drag(drag_info p) {
 		}
 		size_change(old_rect);
 	}
-
-	//pre_point = p;
+	update(false);
 }
 
 void cwindow::size_change(c_rect rect) {

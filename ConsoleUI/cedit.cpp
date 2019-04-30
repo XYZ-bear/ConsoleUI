@@ -14,7 +14,6 @@ cedit::cedit()
 	spin_y_off_ = 0;
 }
 
-
 cedit::~cedit()
 {
 }

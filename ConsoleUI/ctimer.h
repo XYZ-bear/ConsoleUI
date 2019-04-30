@@ -38,7 +38,7 @@ private:
 	priority_queue<base_timer*, vector<base_timer*>, base_timer> _pg;
 	base_timer *_btim=nullptr;
 public:
-	int64_t get_current_time()      //直接调用这个函数就行了，返回值最好是int64_t，long long应该也可以
+	int64_t get_current_time()
 	{
 		timeb t;
 		ftime(&t);
